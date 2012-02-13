@@ -1,0 +1,10 @@
+_task_name_ = string_kw(default="blendheaders")
+drzfile = string_kw(default="",comment="Name(s) of drizzle product(s)") 
+inputs = string_kw(default="",comment="Name(s) of files that went into drzfile (optional)")
+output = string_kw(default="",comment="Name of new file with blended headers (optional)") 
+sciext = string_kw(default="SCI",comment="EXTNAME of science data (optional)")
+errext = string_kw(default="ERR",comment="EXTNAME of error array (optional)")
+dqext = string_kw(default="DQ",comment="EXTNAME of dq array (optional)")
+verbose = boolean_kw(default=False, comment="Print processing messages?")
+
+[ _RULES_ ]
