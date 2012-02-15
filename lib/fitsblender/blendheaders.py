@@ -179,7 +179,8 @@ def blendheaders(drzfile, inputs=None, output=None,
                                 newhdrs[i].update(card.key, extn.header[card.key])
                             else:
                                 del newhdrs[i][card.key]
-                    newhdrs[i].update('EXTNAME', extn.header['EXTNAME'])
+                    newhdrs[i].update('EXTNAME', extn.header['EXTNAME'],after='ORIGIN')
+                    newhdrs[i].update('EXTVER', extn.header['EXTVER'],after='EXTNAME')
                     for kw in WCS_KEYWORDS:
                         if kw in extn.header:
                             newhdrs[i].update(kw,extn.header[kw])
