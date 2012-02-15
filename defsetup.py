@@ -29,7 +29,7 @@ setupargs = {
     'data_files' : [
         ( 'fitsblender/pars',['lib/fitsblender/pars/*']),
         ( 'fitsblender/tests', ['lib/tests/*.fits']),
-        ( 'fitsblender/',['lib/fitsblender/*.rules']),
+        ( 'fitsblender',['lib/fitsblender/*.rules']),
         ],
 }
 
