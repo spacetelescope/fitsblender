@@ -10,8 +10,8 @@ from stsci.tools import fileutil, textutil, parseinput
 from . import blender
 
 __taskname__ = 'blendheaders' # unless someone comes up with anything better
-__version__ = '0.1.0'
-__vdate__ = '13-Feb-2012'
+__version__ = '0.1.1'
+__vdate__ = '22-Feb-2012'
 
 fits_required_bool_kws = ['SIMPLE','EXTEND']
 WCS_KEYWORDS=['CD1_1','CD1_2', 'CD2_1', 'CD2_2', 'CRPIX1',
@@ -449,9 +449,9 @@ class KeywordRules(object):
         
         # Remove section names from output header(s)
         for name in self.section_names:
-            for indx,kw in enumerate(new_header.ascard):
+            for indx,kw in zip(range(len(new_header),0,-1),new_header.ascard[-1::-1]):
                 if name in str(kw.value): 
-                    del new_header.ascard[indx]
+                    del new_header[indx-1]
                 continue
             
         # Delete keywords marked in rules file 
