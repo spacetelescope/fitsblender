@@ -2,6 +2,8 @@
 
 """
 import os
+import glob
+
 import numpy as np
 import pyfits
 
@@ -10,8 +12,13 @@ from stsci.tools import fileutil, textutil, parseinput
 from . import blender
 
 __taskname__ = 'blendheaders' # unless someone comes up with anything better
-__version__ = '0.1.1'
-__vdate__ = '22-Feb-2012'
+__version__ = '1.0.0'
+__vdate__ = '27-Feb-2012'
+
+# Version of rules file format supported by this version of the code
+# All changes should be backwards compatible to older rules versions
+# so any rules file with Version >= __rules_version__ should work with this code
+__rules_version__ = 1.0
 
 fits_required_bool_kws = ['SIMPLE','EXTEND']
 WCS_KEYWORDS=['CD1_1','CD1_2', 'CD2_1', 'CD2_2', 'CRPIX1',
@@ -246,24 +253,29 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
     if not isinstance(inputs, list):
         inputs = [inputs]
 
+    phdrdict = {}
     # Turn input filenames into a set of header objects
     if isinstance(inputs[0], str):
         hdrlist = [[],[],[],[]]
         for fname in inputs:
             #print 'Getting single template for : ',fname
             hdrs = getSingleTemplate(fname, extlist=extlist)
+            rootname = hdrs[0]['rootname'].strip()
+            if rootname not in phdrdict:
+                phdrdict[rootname] = hdrs[0]
             for i in range(len(hdrs)): 
                 hdrlist[i].append(hdrs[i])
     else:
+        rootname = inputs[0]['rootname'].strip()
+        phdrdict[rootname] = inputs[0]
         hdrlist = inputs
-    num_files = len(inputs)
+    # create a list of unique PRIMARY headers for use later
+    phdrlist = []
+    for name in phdrdict: phdrlist.append(phdrdict[name])
     
-    # create list of combined PRIMARY/SCI headers for use in creating
-    # the new table extensions
-    tabhdrs = []
-    for phdr,scihdr in zip(hdrlist[0],hdrlist[1]):
-        tabhdrs.append(cat_headers(phdr,scihdr))
-
+    num_chips = len(inputs)
+    num_files = len(phdrlist)
+    
     # Determine what blending rules need to be merged to create the final 
     # blended headers. There will be a separate set of rules for each 
     # instrument, and all rules get merged into a composite set of rules that
@@ -299,15 +311,27 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
     # Apply rules to each set of input headers 
     new_headers = []
     i=0
-    for hdrs in hdrlist:
+    # apply rules to PRIMARY headers separately, since there is only
+    # 1 PRIMARY header per image, yet many extension headers
+    newphdr,newtab = final_rules.apply(phdrlist)
+    final_rules.add_rules_kws(newphdr)
+    new_headers.append(newphdr)
+    for hdrs in hdrlist[1:]:
         newhdr, newtab = final_rules.apply(hdrs)
         new_headers.append(newhdr)
+
+    # create list of combined PRIMARY/SCI headers for use in creating
+    # the new table extensions
+    tabhdrs = []
+    for phdr,scihdr in zip(hdrlist[0],hdrlist[1]):
+        tabhdrs.append(cat_headers(phdr,scihdr))
     # Create extension table from list of all combined PRI/SCI headers
     tabhdr, newtab = final_rules.apply(tabhdrs)
 
     if len(newtab) > 0:
         # Now merge the results for all the tables into a single table extension
         new_table = pyfits.new_table(newtab)
+        new_table.header['EXTNAME'] = 'HDRTAB'
     else:
         new_table = None
     return new_headers,new_table
@@ -323,14 +347,10 @@ class KeywordRules(object):
         """
         self.instrument = instrument
         self.new_header = None
-        self.rules_file = self.get_filename()
-        if self.rules_file is None:
-            errmsg = textutil.textbox('ERROR:\n'+
-                '    No valid rules file found for instrument: %s\n'%
-                    (self.instrument))
-            print errmsg
-            raise ValueError
+        self.rules_version = None
 
+        self.get_filename() # define rules file
+        self.rules_version,i = self.get_rules_header(self.rules_file)
         rfile = open(self.rules_file)
         self.rule_specs = rfile.readlines()
         rfile.close()
@@ -343,16 +363,68 @@ class KeywordRules(object):
         """ Return name of rules file to be used
         It will use a local copy if present, and use the installed version
         by default. Any local copy will take precendence over the default rules.
+        
+        This function will return the alphabetically first file that applies
+        to the instrument and meets the version requirements
         """
-        rules_name = self.instrument.lower()+self.rules_name_suffix
-        if os.path.exists(rules_name):
-            rules_file = rules_name
-        else:
+        rules_file = None
+        # get all potential local rules 
+        rfiles = glob.glob('*.rules')
+        rfiles.sort()
+        # Sort through list and find only applicable rules files
+        # This would include picking up any rules files using the default
+        # naming convention; namely, <instrument>_header.rules
+        for r in rfiles:
+            v,i = self.get_rules_header(r)
+            if v is None or i is None:
+                continue
+            if v <= __rules_version__ and i == self.instrument.lower():
+                rules_file = r
+                break
+
+        if rules_file is None:
+            # define default rules name installed with the software
+            rules_name = self.instrument.lower()+self.rules_name_suffix
             rules_file = os.path.join(os.path.dirname(__file__),rules_name)
             if not os.path.exists(rules_file):
                 rules_file = None
+
+        if rules_file is None:
+            errmsg = 'ERROR:\n'+'    No valid rules file found for:\n'
+            errmsg += '    INSTRUMENT = %s\n'%(self.instrument)
+            errmsg += '    RULES Version <= %s\n'%(__rules_version__)
+            print textutil.textbox(errmsg)
+            raise ValueError
+
+        self.rules_file = rules_file
         return rules_file
     
+    def get_rules_header(self,filename):
+        """
+        Open a potential rules file and return the recognized
+        version and instrument types provided in the file's first 2 lines
+        """
+        version = None
+        instrument = None
+        f = open(filename) # open file in read-only mode
+        for line in f.readlines():
+            if line[0] == '!':
+                if 'version' in line.lower():
+                    version = float(line.strip('\n').split('=')[-1])
+                if 'instrument' in line.lower():
+                    instrument = line.strip('\n').split('=')[-1]
+                    instrument = instrument.lower().strip()
+        f.close()
+
+        if version is not None and instrument is None:
+            # try to extract instrument name from rules filename, if it
+            # follows the default naming convention
+            if 'header.rules' in filename.lower():
+                inst = filename.split('_header.rules')[0].lower()
+                if inst == self.instrument:
+                    instrument = inst
+        return version,instrument
+        
     def interpret_rules(self,hdrs):
         """ Convert specifications for rules from rules file
             into specific rules for this header(instrument/detector)
@@ -464,19 +536,42 @@ class KeywordRules(object):
         # update each extension separately without making copies of kws from
         # one extension to another.
         for kw in fbdict:
-            if kw in new_header:
-                new_header.update(kw,fbdict[kw],savecomment=True)
-
+            new_header.update(kw,fbdict[kw],savecomment=True)
+        
         # Create summary table 
         if len(tabcols) > 0:
             if tabhdu:
                 new_table = pyfits.new_table(fbtab)
+                new_table.header['EXTNAME'] = 'HDRTAB'
             else:
                 new_table = fbtab
         else:
             new_table = None
         return new_header,new_table
             
+    def add_rules_kws(self,hdr):
+        """ 
+        Update PRIMARY header with HISTORY cards that report the exact
+        rules used to create this header. Only non-comment lines from the 
+        rules file will be reported.
+        """
+        hdr.update('RULESVER',self.rules_version,comment='Version ID for header kw rules file')
+        hdr.update('BLENDVER',__version__,comment='Version of blendheader software used')
+        hdr.update('RULEFILE',self.rules_file,comment='Name of header kw rules file')    
+        hdr.add_history('='*60)
+        hdr.add_history('Header Generation rules:')
+        hdr.add_history('    Rules used to combine headers of input files')
+        hdr.add_history('    Start of rules...')
+        hdr.add_history('-'*60)
+        for rule in self.rule_specs:
+            if rule[0] in ['#',' ',None,"None","INDEF"]:
+                continue
+            hdr.add_history(rule.strip('\n'))
+
+        hdr.add_history('-'*60)
+        hdr.add_history('    End of rules...')
+        hdr.add_history('='*60)
+        
     def index_of(self,kw):
         """ Reports the index of the specified kw
         """
@@ -494,7 +589,7 @@ def interpret_line(line, hdr):
     section_name = None
     delete_kws = []
     # Ignore comment lines in rules file
-    if line[0] == '#' or len(line.strip()) == 0:
+    if line[0] == '#' or len(line.strip()) == 0 or line[0] == '!':
         return rules,section_name,delete_kws
     # clean up input lines
     line = line.strip('\n')
@@ -752,8 +847,9 @@ def cat_headers(hdr1,hdr2):
     """
     Create new pyfits.Header object from concatenating 2 input Headers
     """
-    nhdr = hdr1.copy().ascardlist()
-    nhdr += hdr2.ascardlist()
+    nhdr = hdr1.copy().ascard
+    for c in hdr2.ascard:
+        nhdr.append(c)
             
     return pyfits.Header(nhdr)
 
@@ -765,3 +861,4 @@ def extract_filenames_from_drz(drzfile):
     phdr = pyfits.getheader(drzfile)
     fnames = phdr['D0*DATA'].values()
     return fnames
+
