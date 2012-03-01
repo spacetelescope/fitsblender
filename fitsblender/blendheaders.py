@@ -269,6 +269,8 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
         rootname = inputs[0]['rootname'].strip()
         phdrdict[rootname] = inputs[0]
         hdrlist = inputs
+
+
     # create a list of unique PRIMARY headers for use later
     phdrlist = []
     for name in phdrdict: phdrlist.append(phdrdict[name])
@@ -437,19 +439,7 @@ class KeywordRules(object):
         if not isinstance(hdrs, list):
             hdrs = [hdrs]
 
-        # remove boolean keywords from headers as they will not 
-        # produce valid values for inclusion in the pyfits.BinTableHDU
-        #
-        for hdr in hdrs:
-            kw_del_list = []
-            for kw in hdr.ascard:
-                if isinstance(kw.value,np.bool) and (
-                    kw.key not in fits_required_bool_kws):
-                    kw_del_list.append(kw.key)
-            for kw in kw_del_list[-1::-1]:
-                del hdr[kw]
-
-        # apply rules to 'cleaned' headers
+        # apply rules to headers
         for hdr in hdrs:
             new_rules = []
             for rule in self.rule_specs:
