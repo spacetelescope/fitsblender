@@ -13,7 +13,7 @@ from . import blender
 
 __taskname__ = 'blendheaders' # unless someone comes up with anything better
 __version__ = '1.0.0'
-__vdate__ = '27-Feb-2012'
+__vdate__ = '01-Mar-2012'
 
 # Version of rules file format supported by this version of the code
 # All changes should be backwards compatible to older rules versions
