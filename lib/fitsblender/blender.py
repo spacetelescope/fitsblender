@@ -235,6 +235,10 @@ def fitsblender(headers, spec):
     for i, mapping in enumerate(mappings):
         if mapping.agg_func is None:
             array = np.array(data[i])
+            if np.issubdtype(np.int32,array.dtype):
+                # see about recasting as int32
+                if not np.any(array/(2**31 - 1) > 1.):
+                    array = array.astype(np.int32)
             dtype.append((mapping.dst_name, array.dtype))
             arrays.append(array)
     if len(dtype):
