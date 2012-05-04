@@ -12,8 +12,8 @@ from stsci.tools import fileutil, textutil, parseinput
 from . import blender
 
 __taskname__ = 'blendheaders' # unless someone comes up with anything better
-__version__ = '1.0.0'
-__vdate__ = '01-Mar-2012'
+__version__ = '1.0.1'
+__vdate__ = '04-May-2012'
 
 # Version of rules file format supported by this version of the code
 # All changes should be backwards compatible to older rules versions
@@ -29,7 +29,7 @@ WCS_KEYWORDS=['CD1_1','CD1_2', 'CD2_1', 'CD2_2', 'CRPIX1',
 def multi(vals):
     """
     This will either return the common value from a list of identical values
-    or 'MULTIPLE' 
+    or 'MULTIPLE'
     """
     uniq_vals = list(set(vals))
     num_vals = len(uniq_vals)
@@ -52,10 +52,10 @@ blender_funcs = {'first':blender.first,
 
 delete_command = '<delete>'
 
-#### TEAL Interfaces to run this task    
+#### TEAL Interfaces to run this task
 
 def getHelpAsString(docstring=False):
-    """ 
+    """
     return useful help from a file in the script directory called __taskname__.help
     """
     install_dir = os.path.dirname(__file__)
@@ -83,30 +83,30 @@ def run(configobj):
                 verbose=configobj['verbose'])
 
 #### Primary functional interface for the code
-def blendheaders(drzfile, inputs=None, output=None, 
-                sciext='SCI', errext='ERR', dqext='DQ', 
+def blendheaders(drzfile, inputs=None, output=None,
+                sciext='SCI', errext='ERR', dqext='DQ',
                 verbose=False):
-    """ Blend headers that went into creating the original drzfile into a 
+    """ Blend headers that went into creating the original drzfile into a
     new header with table that contains keyword values from all input images.
-    
+
     The drzfile will be used to determine the names of the input files, should
     no filenames be provided in the 'inputs' parameter.
-    
+
     The drzfile will be updated 'in-place' with the new headers and table if
     no output filename has been provided.
-    
+
     Parameters
     ----------
     drzfile : str
         Name of drizzled image(s) with headers that need updating. This can
         be specified as a single filename, or using wildcards, or '@'-file or
         python list of filenames.
-        When no value for 'inputs' has been provided, this file(or set of files) 
-        will be used to determine the names of the input (flt.fits) files 
+        When no value for 'inputs' has been provided, this file(or set of files)
+        will be used to determine the names of the input (flt.fits) files
         whose headers need to be blended to create the new drzfile header.
-    
+
     inputs : list, optional
-        If provided, the filenames with extensions for each chip 
+        If provided, the filenames with extensions for each chip
         provided in this list will be used to get
         the headers which will be blended into the final output headers.
         For example, ['j9cd01kqq_flt.fits[sci,1]','j9cd01kqq_flt.fits[sci,2]']
@@ -115,30 +115,30 @@ def blendheaders(drzfile, inputs=None, output=None,
     output : str, optional
         If specified, a new file will be written out that contains the updated
         (blended) headers.
-    
+
     sciext: str, optional [Default: 'SCI']
-        EXTNAME of extensions with science data from the input FITS files. The 
+        EXTNAME of extensions with science data from the input FITS files. The
         header of this extension will be used as the basis for the SCI header
         of the drizzled product FITS file.
 
     errext: str, optional [Default: 'ERR']
-        EXTNAME of extensions with the error array from the input FITS files. The 
+        EXTNAME of extensions with the error array from the input FITS files. The
         header of this extension will be used as the basis for the WHT header
         of the drizzled product FITS file. If blank or "INDEF", it will use
         the 'SCI' header as the basis for the output header for the WHT array.
 
     dqext: str, optional [Default: 'DQ']
-        EXTNAME of extensions with the data quality array from the input FITS 
-        files. The header of this extension will be used as the basis for the 
+        EXTNAME of extensions with the data quality array from the input FITS
+        files. The header of this extension will be used as the basis for the
         CTX header of the drizzled product FITS file (when a CTX extension gets
-        created). If blank or "INDEF", it will use the 'SCI' header as the 
+        created). If blank or "INDEF", it will use the 'SCI' header as the
         basis for the header of any generated CTX array.
-        
+
     verbose : bool, optional [Default: False]
         Print out additional messages during processing when specified.
-        
+
     """
-    # interpret input 
+    # interpret input
     drzfiles = parseinput.parseinput(drzfile)[0]
 
     # operate on each drzfile specified
@@ -152,21 +152,21 @@ def blendheaders(drzfile, inputs=None, output=None,
 
         newhdrs, newtab = get_blended_headers(inputs,verbose=verbose)
 
-                    
+
         # Remove distortion related keywords not included in rules
         for hdr in newhdrs:
             remove_distortion_keywords(hdr)
-        
+
         # open drizzle product to update headers with new headers
         open_mode='update'
         if output not in [None,'',' ','INDEF','None']:
             open_mode = 'readonly'
         drzimg = pyfits.open(drzfile,mode=open_mode)
-        
+
         # Determine whether we are working with a simple DRZ FITS file or
         # a full multi-extension DRZ FITS file.
         if len(drzimg) < 3:
-            # We are working with a simple FITS image, so concatenate the 
+            # We are working with a simple FITS image, so concatenate the
             # blended PRIMARY and SCI  headers
             drzimg[0].header = cat_headers(newhdrs[0],newhdrs[1])
             drzimg.append(newtab)
@@ -182,7 +182,7 @@ def blendheaders(drzfile, inputs=None, output=None,
                     newhdrs[i].update('BITPIX',extn.header['BITPIX'])
                     for card in newhdrs[i]['naxis*']:
                         if len(card.key) > 5: # naxisj keywords
-                            if extn_naxis > 0: 
+                            if extn_naxis > 0:
                                 newhdrs[i].update(card.key, extn.header[card.key])
                             else:
                                 del newhdrs[i][card.key]
@@ -197,7 +197,7 @@ def blendheaders(drzfile, inputs=None, output=None,
                     newhdrs[i].update('NEXTEND',len(drzimg)-1)
                     newhdrs[i].update('ROOTNAME',extn.header['rootname'])
                     newhdrs[i].update('BITPIX',extn.header['bitpix'])
-                    # Determine which keywords are included in the table but not 
+                    # Determine which keywords are included in the table but not
                     # the new dict(header). These will be removed from the output
                     # header altogether
                     tabcols = newtab.data.dtype.names
@@ -228,7 +228,7 @@ def blendheaders(drzfile, inputs=None, output=None,
 
 
 def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
-    """ 
+    """
     Return a set of blended headers based on the input files/headers provided
 
     Parameters
@@ -236,7 +236,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
     inputs : list
         Either a single list of filenames from which to extract the headers to
         be blended, or a list of lists of pyfits.Header objects to be blended.
-        
+
     Returns
     -------
     headers : list
@@ -245,10 +245,10 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
 
     new_table : object
         Single pyfits.TableHDU object that contains the combined results from
-        all input headers(extension). Each row will correspond to an image, 
+        all input headers(extension). Each row will correspond to an image,
         and each column corresponds to a single keyword listed in the rules.
 
-    """    
+    """
     hdrlist = None
     if not isinstance(inputs, list):
         inputs = [inputs]
@@ -263,7 +263,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
             rootname = hdrs[0]['rootname'].strip()
             if rootname not in phdrdict:
                 phdrdict[rootname] = hdrs[0]
-            for i in range(len(hdrs)): 
+            for i in range(len(hdrs)):
                 hdrlist[i].append(hdrs[i])
     else:
         rootname = inputs[0]['rootname'].strip()
@@ -274,15 +274,15 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
     # create a list of unique PRIMARY headers for use later
     phdrlist = []
     for name in phdrdict: phdrlist.append(phdrdict[name])
-    
+
     num_chips = len(inputs)
     num_files = len(phdrlist)
-    
-    # Determine what blending rules need to be merged to create the final 
-    # blended headers. There will be a separate set of rules for each 
+
+    # Determine what blending rules need to be merged to create the final
+    # blended headers. There will be a separate set of rules for each
     # instrument, and all rules get merged into a composite set of rules that
     # get applied to all input headers regardless of instrument.
-    # 
+    #
     # Instrument identification will be extracted from the INSTRUME keyword from
     # the PRIMARY header of each input
     #
@@ -294,7 +294,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
         if inst not in icache:
             # initialize the appropriate class for this data's instrument
             inst_class = KeywordRules(inst.lower())
-            # Interpret rules for this class based on image that 
+            # Interpret rules for this class based on image that
             # initialized this instrument's rules
             for h in hlist:
                 inst_class.interpret_rules(h)
@@ -310,7 +310,8 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
         else:
             final_rules.merge(icache[inst])
 
-    # Apply rules to each set of input headers 
+
+    # Apply rules to each set of input headers
     new_headers = []
     i=0
     # apply rules to PRIMARY headers separately, since there is only
@@ -337,14 +338,14 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
     else:
         new_table = None
     return new_headers,new_table
-        
+
 #### Classes for managing keyword rules
 class KeywordRules(object):
-    
+
     rules_name_suffix = '_header.rules'
-    
+
     def __init__(self,instrument):
-        """ Read in the rules used to interpret the keywords from the specified 
+        """ Read in the rules used to interpret the keywords from the specified
             instrument image header.
         """
         self.instrument = instrument
@@ -356,23 +357,24 @@ class KeywordRules(object):
         rfile = open(self.rules_file)
         self.rule_specs = rfile.readlines()
         rfile.close()
-        
+
         self.rules = []
         self.section_names = []
         self.delete_kws = []
-        
+
     def get_filename(self):
         """ Return name of rules file to be used
         It will use a local copy if present, and use the installed version
         by default. Any local copy will take precendence over the default rules.
-        
+
         This function will return the alphabetically first file that applies
         to the instrument and meets the version requirements
         """
         rules_file = None
-        # get all potential local rules 
+        # get all potential local rules
         rfiles = glob.glob('*.rules')
         rfiles.sort()
+
         # Sort through list and find only applicable rules files
         # This would include picking up any rules files using the default
         # naming convention; namely, <instrument>_header.rules
@@ -400,7 +402,7 @@ class KeywordRules(object):
 
         self.rules_file = rules_file
         return rules_file
-    
+
     def get_rules_header(self,filename):
         """
         Open a potential rules file and return the recognized
@@ -426,14 +428,14 @@ class KeywordRules(object):
                 if inst == self.instrument:
                     instrument = inst
         return version,instrument
-        
+
     def interpret_rules(self,hdrs):
         """ Convert specifications for rules from rules file
             into specific rules for this header(instrument/detector)
-            
-            This allows for expansion rules to be applied to rules 
+
+            This allows for expansion rules to be applied to rules
             from the rules files (such as any wildcards or section titles).
-        """        
+        """
         if isinstance(hdrs, tuple):
             hdrs = list(hdrs)
         if not isinstance(hdrs, list):
@@ -447,7 +449,7 @@ class KeywordRules(object):
                 if irule is not None and len(irule) > 0:
                     for i in irule: # prevent multiple rules for a kw
                         if i not in new_rules: new_rules.append(i)
-                # Keep track of section names, so they can be deleted from 
+                # Keep track of section names, so they can be deleted from
                 # the final output header
                 if section_name is not None:
                     self.section_names.append(section_name)
@@ -459,8 +461,8 @@ class KeywordRules(object):
                 self.merge(new_rules)
             else:
                 self.rules = new_rules
-                        
-        
+
+
     def merge(self,kwrules):
         """
         Merge a new set of interpreted rules into the current set
@@ -469,36 +471,39 @@ class KeywordRules(object):
         a new header).
         """
         if isinstance(kwrules, KeywordRules):
-            kwrules = kwrules.rules
-        # Determine what rules are specified in kwrules that 
+            kwrules = kwrules.rules.copy()
+        # Determine what rules are specified in kwrules that
         #    are NOT in self.rules
-        delta = list(set(kwrules) - set(self.rules))
+        delta = list(set(self.rules) - set(kwrules))
+        # Delete these extraneous rules from input kwrules
+        for r in delta:
+            if r in kwrules: del kwrules[r]
 
         # extend self.rules with additional rules
-        self.rules.extend(delta)
+        self.rules.extend(kwrules)
 
     def apply(self,headers,tabhdu=False):
-        """ For a full list of headers, apply the specified rules to 
+        """ For a full list of headers, apply the specified rules to
             generate a dictionary of new values and a table using
             fitsblender. This method can be called separately for
             each type of header that needs to be generated; such as,
             Primary, SCI, WHT, CTX,...
-                       
+
             This method returns the new header and summary table
-            as pyfits.Header and numpy.ndarray masked array or 
+            as pyfits.Header and numpy.ndarray masked array or
             pyfits.binTableHDU objects
         """
         # Apply rules to headers
         fbdict,fbtab = blender.fitsblender(headers,self.rules)
 
-        # Determine which keywords are included in the table but not 
+        # Determine which keywords are included in the table but not
         # the new dict(header). These will be removed from the output
         # header altogether
         tabcols = fbtab.dtype.names
         hdrkws = fbdict.keys()
         del_kws = list(set(tabcols) - set(hdrkws))
 
-        # Start with a copy of the template as the new header 
+        # Start with a copy of the template as the new header
         # This will define what keywords need to be updated, as the rules
         # and input headers often include headers for multiple extensions in
         # order to build the complete table for all the keywords in the file
@@ -508,27 +513,27 @@ class KeywordRules(object):
         # Delete all keywords from copy that are being moved into the table
         for kw in del_kws:
             if kw in new_header: del new_header[kw]
-        
+
         # Remove section names from output header(s)
         for name in self.section_names:
             for indx,kw in zip(range(len(new_header),0,-1),new_header.ascard[-1::-1]):
-                if name in str(kw.value): 
+                if name in str(kw.value):
                     del new_header[indx-1]
                 continue
-            
-        # Delete keywords marked in rules file 
+
+        # Delete keywords marked in rules file
         for kw in self.delete_kws:
             if kw in new_header: del new_header[kw]
-            
+
         # Apply updated/blended values into new header, but only those
         # keywords which are already present in the 'template' new header
-        # this allows the rules to be used on all extensions at once yet 
+        # this allows the rules to be used on all extensions at once yet
         # update each extension separately without making copies of kws from
         # one extension to another.
         for kw in fbdict:
             new_header.update(kw,fbdict[kw],savecomment=True)
-        
-        # Create summary table 
+
+        # Create summary table
         if len(tabcols) > 0:
             if tabhdu:
                 new_table = pyfits.new_table(fbtab)
@@ -538,16 +543,16 @@ class KeywordRules(object):
         else:
             new_table = None
         return new_header,new_table
-            
+
     def add_rules_kws(self,hdr):
-        """ 
+        """
         Update PRIMARY header with HISTORY cards that report the exact
-        rules used to create this header. Only non-comment lines from the 
+        rules used to create this header. Only non-comment lines from the
         rules file will be reported.
         """
         hdr.update('RULESVER',self.rules_version,comment='Version ID for header kw rules file')
         hdr.update('BLENDVER',__version__,comment='Version of blendheader software used')
-        hdr.update('RULEFILE',self.rules_file,comment='Name of header kw rules file')    
+        hdr.update('RULEFILE',self.rules_file,comment='Name of header kw rules file')
         hdr.add_history('='*60)
         hdr.add_history('Header Generation rules:')
         hdr.add_history('    Rules used to combine headers of input files')
@@ -561,7 +566,7 @@ class KeywordRules(object):
         hdr.add_history('-'*60)
         hdr.add_history('    End of rules...')
         hdr.add_history('='*60)
-        
+
     def index_of(self,kw):
         """ Reports the index of the specified kw
         """
@@ -569,10 +574,10 @@ class KeywordRules(object):
         for r,i in zip(self.rules, range(len(self.rules))):
             if r[0] == kw: indx.append(i)
         return indx
-    
-#### Utility functions 
+
+#### Utility functions
 def interpret_line(line, hdr):
-    """ Generate the rule(s) specified by the input line from the rules file 
+    """ Generate the rule(s) specified by the input line from the rules file
     """
     # Initialize output values
     rules = []
@@ -583,16 +588,16 @@ def interpret_line(line, hdr):
         return rules,section_name,delete_kws
     # clean up input lines
     line = line.strip('\n')
-    
+
     # strip off any comment from the line before parsing the line
     if '#' in line: line = line[:line.rfind('#')].strip()
-    
+
     # Parse the line
     use_kws = True
     if delete_command in line:
         use_kws = False
         line = line.replace(delete_command,'').lstrip()
-        
+
     if '/' in line:
         section_name = line.split('/')[1].strip()
         kws = find_keywords_in_section(hdr, section_name)
@@ -609,11 +614,11 @@ def interpret_line(line, hdr):
             kws2 = kws
         else:
             kws = [kwnames[0]]
-            if len(kwnames) > 1: 
+            if len(kwnames) > 1:
                 kws2 = [kwnames[1]]
             else:
                 kws2 = kws
-                
+
         lrule = None
         if len(kwnames) > 2:
             indx = line.index(kwnames[2])
@@ -621,7 +626,7 @@ def interpret_line(line, hdr):
 
         # Interpret short-hand rules using dict
         if lrule is not None and len(lrule) > 0:
-            if lrule in blender_funcs:                        
+            if lrule in blender_funcs:
                 lrule = blender_funcs[lrule]
             else:
                 lrule = None
@@ -632,18 +637,18 @@ def interpret_line(line, hdr):
                     if new_rule not in rules: rules.append(new_rule)
                 else:
                     delete_kws.append(kw)
-        else:                
+        else:
             for kw,kw2 in zip(kws,kws2):
                 if use_kws:
                     new_rule = (kw,kw2)
                     if new_rule not in rules: rules.append(new_rule)
                 else:
                     delete_kws.append(kw)
-                    
+
     return rules,section_name,delete_kws
 
 def find_keywords_in_section(hdr,title):
-    """ Return a list of keyword names from hdr identified in the section 
+    """ Return a list of keyword names from hdr identified in the section
         with the specified section title.
     """
     # Indentify card indices of start and end of specified section
@@ -666,8 +671,45 @@ def find_keywords_in_section(hdr,title):
     # remove any blank keywords
     while section_keys.count('') > 0:
         section_keys.remove('')
-    
+
     return section_keys
+
+def remove_distortion_keywords(hdr):
+    """
+    Remove WCS distortion related keywords from the input header
+    """
+    distortion_kws = ['TDDALPHA','TDDBETA',
+                        'D2IMEXT','D2IMERR',
+                        'DGEOEXT','NPOLEXT']
+
+    # Remove any reference to TDD correction from
+    #    distortion-corrected products
+    # We also need to remove the D2IM* keywords so that HSTWCS/PyWCS
+    # does not try to look for non-existent extensions
+    for kw in distortion_kws:
+        if kw in hdr:
+            del hdr[kw]
+
+    # Remove '-SIP' from CTYPE for output product
+    if 'ctype1' in hdr and hdr['ctype1'].find('SIP') > -1:
+            hdr.update('ctype1', hdr['ctype1'][:-4])
+            hdr.update('ctype2',hdr['ctype2'][:-4])
+
+    # Remove SIP coefficients from DRZ product
+    for k in hdr.items():
+        if (k[0][:2] in ['A_','B_']) or (k[0][:3] in ['IDC','SCD'] and k[0] != 'IDCTAB') or \
+        (k[0][:6] in ['SCTYPE','SCRVAL','SNAXIS','SCRPIX']):
+            del hdr[k[0]]
+    # Remove paper IV related keywords related to the
+    #   DGEO correction here
+    for k in hdr.items():
+        if (k[0][:2] == 'DP'):
+            del hdr[k[0]+'*']
+            del hdr[k[0]+'.*']
+            del hdr[k[0]+'.*.*']
+        if (k[0][:2] == 'CP'):
+            del hdr[k[0]]
+
 
 def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
     """
@@ -677,10 +719,10 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
     # NOTE: Returns 'pyfits.Header' objects, not HDU objects!
     #
     """
-        
+
     if fname is None:
         raise ValueError('No data files for creating FITS output.')
-    
+
     froot,fextn = fileutil.parseFilename(fname)
     if fextn is not None:
         fnum = fileutil.parseExtn(fextn)[1]
@@ -729,9 +771,9 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
         errhdr = pyfits.Header(cards=ftemplate[extnum].header.ascard.copy())
         #errhdr.update('extver',1)
         errhdr.update('bunit','UNITLESS')
-        
+
         if len(extlist) > 2 and extlist[2] not in [None,'',' ','INDEF','None']:
-        
+
             if fextn is None:
                 extnum = fileutil.findKeywordExtn(ftemplate,_extkey,extlist[2])
             else:
@@ -746,7 +788,7 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
                     extnum = (extlist[0],fnum)
         else:
             extnum = extnum_sci
-            
+
         dqhdr = pyfits.Header(cards=ftemplate[extnum].header.ascard.copy())
         #dqhdr.update('extver',1)
         dqhdr.update('bunit','UNITLESS')
@@ -760,17 +802,17 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
     ftemplate.close()
     del ftemplate
 
-    return prihdr,scihdr,errhdr,dqhdr  
+    return prihdr,scihdr,errhdr,dqhdr
 
 def merge_tables_by_cols(tables):
-    """ 
+    """
     Merge all input tables provided as a list of np.ndarray objects into a
-    single np.ndarray object 
+    single np.ndarray object
     """
     # build new list of dtypes for all cols from all tables
     # However, skip duplicate columns from subsequent tables
     # Only the values from the last table will be kept for duplicate columns
-    new_dtypes = [] 
+    new_dtypes = []
     new_cnames = []
     num_rows = len(tables[0])
     print '#'*40
@@ -789,7 +831,7 @@ def merge_tables_by_cols(tables):
     # create an empty table with the combined dtypes from all input tables
     new_table = np.zeros((num_rows,),dtype=new_dtypes)
     print new_dtypes
-    # copy data column-by-column from each input to new output table 
+    # copy data column-by-column from each input to new output table
     for t in tables:
         for cname in t.dtype.names:
             print 'CNAME: ',cname,' with dtype: ',t[cname].dtype,new_table[cname].dtype
@@ -797,42 +839,6 @@ def merge_tables_by_cols(tables):
 
     return new_table
 
-def remove_distortion_keywords(hdr):
-    """
-    Remove WCS distortion related keywords from the input header
-    """
-    distortion_kws = ['TDDALPHA','TDDBETA',
-                        'D2IMEXT','D2IMERR',
-                        'DGEOEXT','NPOLEXT']
-                        
-    # Remove any reference to TDD correction from
-    #    distortion-corrected products
-    # We also need to remove the D2IM* keywords so that HSTWCS/PyWCS
-    # does not try to look for non-existent extensions
-    for kw in distortion_kws:
-        if kw in hdr:
-            del hdr[kw]
-
-    # Remove '-SIP' from CTYPE for output product
-    if 'ctype1' in hdr and hdr['ctype1'].find('SIP') > -1:
-            hdr.update('ctype1', hdr['ctype1'][:-4])
-            hdr.update('ctype2',hdr['ctype2'][:-4])
-
-    # Remove SIP coefficients from DRZ product
-    for k in hdr.items():
-        if (k[0][:2] in ['A_','B_']) or (k[0][:3] in ['IDC','SCD'] and k[0] != 'IDCTAB') or \
-        (k[0][:6] in ['SCTYPE','SCRVAL','SNAXIS','SCRPIX']):
-            del hdr[k[0]]
-    # Remove paper IV related keywords related to the
-    #   DGEO correction here
-    for k in hdr.items():
-        if (k[0][:2] == 'DP'):
-            del hdr[k[0]+'*']
-            del hdr[k[0]+'.*']
-            del hdr[k[0]+'.*.*']
-        if (k[0][:2] == 'CP'):
-            del hdr[k[0]]
-    
 def cat_headers(hdr1,hdr2):
     """
     Create new pyfits.Header object from concatenating 2 input Headers
@@ -840,15 +846,14 @@ def cat_headers(hdr1,hdr2):
     nhdr = hdr1.copy().ascard
     for c in hdr2.ascard:
         nhdr.append(c)
-            
+
     return pyfits.Header(nhdr)
 
 def extract_filenames_from_drz(drzfile):
-    """ 
+    """
     Returns the list of filenames with extensions of input chips that was
     used to generate the drizzle product.
     """
     phdr = pyfits.getheader(drzfile)
     fnames = phdr['D0*DATA'].values()
     return fnames
-
