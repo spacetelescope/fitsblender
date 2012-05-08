@@ -310,7 +310,6 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
         else:
             final_rules.merge(icache[inst])
 
-
     # Apply rules to each set of input headers
     new_headers = []
     i=0
@@ -471,16 +470,17 @@ class KeywordRules(object):
         a new header).
         """
         if isinstance(kwrules, KeywordRules):
-            kwrules = kwrules.rules.copy()
+            kwrules = kwrules.rules
+
         # Determine what rules are specified in kwrules that
         #    are NOT in self.rules
-        delta = list(set(self.rules) - set(kwrules))
+        k = []
         # Delete these extraneous rules from input kwrules
-        for r in delta:
-            if r in kwrules: del kwrules[r]
+        for r in kwrules:
+            if r not in self.rules: k.append(r)
 
         # extend self.rules with additional rules
-        self.rules.extend(kwrules)
+        self.rules.extend(k)
 
     def apply(self,headers,tabhdu=False):
         """ For a full list of headers, apply the specified rules to
@@ -532,6 +532,7 @@ class KeywordRules(object):
         # one extension to another.
         for kw in fbdict:
             new_header.update(kw,fbdict[kw],savecomment=True)
+
 
         # Create summary table
         if len(tabcols) > 0:
