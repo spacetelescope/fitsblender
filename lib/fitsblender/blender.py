@@ -241,6 +241,7 @@ def fitsblender(headers, spec):
                     array = array.astype(np.int32)
             dtype.append((mapping.dst_name, array.dtype))
             arrays.append(array)
+
     if len(dtype):
         # Combine the columns into a structured array
         table = ma.empty((len(headers),), dtype=dtype)

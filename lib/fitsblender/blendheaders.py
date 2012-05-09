@@ -12,8 +12,8 @@ from stsci.tools import fileutil, textutil, parseinput
 from . import blender
 
 __taskname__ = 'blendheaders' # unless someone comes up with anything better
-__version__ = '1.0.1'
-__vdate__ = '04-May-2012'
+__version__ = '1.0.2'
+__vdate__ = '09-May-2012'
 
 # Version of rules file format supported by this version of the code
 # All changes should be backwards compatible to older rules versions
@@ -296,8 +296,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
             inst_class = KeywordRules(inst.lower())
             # Interpret rules for this class based on image that
             # initialized this instrument's rules
-            for h in hlist:
-                inst_class.interpret_rules(h)
+            inst_class.interpret_rules(hlist)
 
             # Now add this interpreted class to the cache
             icache[inst] = inst_class
@@ -357,6 +356,7 @@ class KeywordRules(object):
         self.rule_specs = rfile.readlines()
         rfile.close()
 
+        self.rule_objects = []
         self.rules = []
         self.section_names = []
         self.delete_kws = []
@@ -441,26 +441,24 @@ class KeywordRules(object):
             hdrs = [hdrs]
 
         # apply rules to headers
-        for hdr in hdrs:
-            new_rules = []
-            for rule in self.rule_specs:
-                irule,section_name,delete_kws = interpret_line(rule,hdr)
-                if irule is not None and len(irule) > 0:
-                    for i in irule: # prevent multiple rules for a kw
-                        if i not in new_rules: new_rules.append(i)
-                # Keep track of section names, so they can be deleted from
-                # the final output header
-                if section_name is not None:
-                    self.section_names.append(section_name)
-                if len(delete_kws) > 0:
-                    self.delete_kws.extend(delete_kws)
+        for rule in self.rule_specs:
+            if rule[0] in ['#',' ',None,"None","INDEF"]:
+                continue
+            kwr = KwRule(rule)
+            duplicate_rule = False
+            for robj in self.rule_objects:
+                if kwr.rule_spec == robj.rule_spec:
+                    duplicate_rule = True
+                    break
+            if not duplicate_rule:
+                for hdr in hdrs:
+                    kwr.interpret(hdr)
+                self.rule_objects.append(kwr)
 
-            if len(self.rules) > 0:
-                # merge new set of rules with previously interpreted rules
-                self.merge(new_rules)
-            else:
-                self.rules = new_rules
-
+        for kwr in self.rule_objects:
+            self.rules.extend(kwr.rules)
+            self.delete_kws.extend(kwr.delete_kws)
+            self.section_names.extend(kwr.section_name)
 
     def merge(self,kwrules):
         """
@@ -575,6 +573,38 @@ class KeywordRules(object):
         for r,i in zip(self.rules, range(len(self.rules))):
             if r[0] == kw: indx.append(i)
         return indx
+
+class KwRule(object):
+    """
+    This class encapsulates the logic needed for interpreting a single keyword
+    rule from a text file.
+
+    The .rules attribute contains the interpreted set of rules that corresponds
+    to this line.
+    """
+    def __init__(self,line):
+        self.rule_spec = line # line read in from rules file
+        self.rules = []
+        self.delete_kws = []
+        self.section_name = []
+
+    def interpret(self,hdr):
+        if self.rules:
+            # If self.rules has already been defined for this rule, do not try
+            # to interpret it any further with additional headers
+            return
+        irules,sname,delkws = interpret_line(self.rule_spec,hdr)
+        # keep track of any section name identified for this rule
+        if sname:
+            self.section_name = sname
+        # also keep track of what keywords should be deleted based on this rule
+        if delkws:
+            self.delete_kws = delkws
+
+        # Now, interpret rule based on presence of kw in hdr
+        if irules:
+            self.rules = irules
+
 
 #### Utility functions
 def interpret_line(line, hdr):
