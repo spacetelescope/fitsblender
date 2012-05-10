@@ -509,8 +509,10 @@ class KeywordRules(object):
         new_header = headers[0].copy()
 
         # Delete all keywords from copy that are being moved into the table
-        for kw in del_kws:
-            if kw in new_header: del new_header[kw]
+        # However, this should only be done for those keywords which do are not
+        # being kept in the header through fbdict (additional rules)
+        for kw in del_kws :
+            if (kw in new_header): del new_header[kw]
 
         # Remove section names from output header(s)
         for name in self.section_names:
@@ -530,7 +532,6 @@ class KeywordRules(object):
         # one extension to another.
         for kw in fbdict:
             new_header.update(kw,fbdict[kw],savecomment=True)
-
 
         # Create summary table
         if len(tabcols) > 0:
@@ -596,7 +597,8 @@ class KwRule(object):
         irules,sname,delkws = interpret_line(self.rule_spec,hdr)
         # keep track of any section name identified for this rule
         if sname:
-            self.section_name = sname
+            self.section_name.append(sname)
+
         # also keep track of what keywords should be deleted based on this rule
         if delkws:
             self.delete_kws = delkws
