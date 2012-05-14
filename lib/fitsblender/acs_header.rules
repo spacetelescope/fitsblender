@@ -1,30 +1,35 @@
+!VERSION = 1.0
+!INSTRUMENT = ACS
 ################################################################################
 #
 # Header keyword rules
 #
 # Columns definitions:
 #    Column 1: header keyword from input header or '<delete>'
-#    Column 2: [optional] name of table column for recording values from 
-#              keyword specified in the first column from each input image 
+#    Column 2: [optional] name of table column for recording values from
+#              keyword specified in the first column from each input image
 #              =or= name of keyword to be updated in output image header
 #    Column 3: [optional] function to use to create output header value
 #              (output keyword name must be specified in second column)
 #
-# Any line that starts with '<delete>' indicates that that keyword 
-# or set of keywords for that header section should be deleted from the 
+# Any line that starts with '<delete>' indicates that that keyword
+# or set of keywords for that header section should be deleted from the
 # output header.
 #
 # Supported functions: first, last, min, max, mean, sum, stddev, multi
 #
-# Any keyword without a function will be copied to a table column with the 
+# Any keyword without a function will be copied to a table column with the
 # name given in the second column, or first column if only 1 column has been
 # specified.  These keywords will also be removed from the output header unless
 # another rule for the same keyword (1st column) has been specified with a
 # function named in the 3rd column.
-# 
-# All keywords not specified in this rules file will be derived from the first
-# input image's header and used unchanged to create the final output header(s). 
 #
+# All keywords *not specified in this rules file* will be derived from the first
+# input image's header and used unchanged to create the final output header(s).
+# So, any keyword with a rule that adds that keyword to a table will be removed from
+# the output headers unless additional rules are provided to specify what values
+# should be kept in the header for that keyword.
+##
 # Final header output will use the same formatting and order of keywords defined
 # by the first image's headers.
 #
@@ -32,200 +37,340 @@
 # file without regard for order, although keeping them organized by extension
 # makes the file easier to maintain and update.
 #
-# The order of the rules will determine the order of the columns in the 
+# The order of the rules will determine the order of the columns in the
 # final output table. As a result, the rules for EXTNAME and EXTVER are
 # associated with ROOTNAME, rather than the SCI header, in order to make
 # rows of the table easier to identify.
 #
-# Comments appended to the end of a rule will be ignored when reading the 
+# Comments appended to the end of a rule will be ignored when reading the
 # rules. All comments start with '#'.
-# 
+#
 #
 ################################################################################
 #
-# Primary Header Rules
+# Table Keyword Rules
 #
 ################################################################################
-TELESCOP  TELESCOP  first
-PRIMESI   PRIMESI   first
-EQUINOX   EQUINOX   first
-ROOTNAME  ROOTNAME    first
-TARGNAME  TARGNAME    first
-RA_TARG   RA_TARG     first
-DEC_TARG  DEC_TARG    first
-
-EXPSTART  EXPSTART    min
-EXPEND    EXPEND      max
-EXPTIME   EXPTIME     sum
-EXPTIME   TEXPTIME     sum
+ROOTNAME
+EXTNAME 
+EXTVER  
+A_0_2   
+A_0_3   
+A_0_4   
+A_1_1   
+A_1_2   
+A_1_3   
+A_2_0   
+A_2_1   
+A_2_2   
+A_3_0   
+A_3_1   
+A_4_0   
+ACQNAME 
+A_ORDER 
+APERTURE
+ASN_ID  
+ASN_MTYP
+ASN_TAB 
+ATODCORR
+ATODGNA 
+ATODGNB 
+ATODGNC 
+ATODGND 
+ATODTAB 
+B_0_2   
+B_0_3   
+B_0_4   
+B_1_1   
+B_1_2   
+B_1_3   
+B_2_0   
+B_2_1   
+B_2_2   
+B_3_0   
+B_3_1   
+B_4_0   
+BADINPDQ
+BIASCORR
+BIASFILE
+BIASLEVA
+BIASLEVB
+BIASLEVC
+BIASLEVD
+BINAXIS1
+BINAXIS2
+BITPIX  
+BLEVCORR
+B_ORDER 
+BPIXTAB 
+BUNIT   
+CAL_VER 
+CBLKSIZ 
+CCDAMP  
+CCDCHIP 
+CCDGAIN 
+CCDOFSTA
+CCDOFSTB
+CCDOFSTC
+CCDOFSTD
+CCDTAB  
+CD1_1   
+CD1_2   
+CD2_1   
+CD2_2   
+CENTERA1
+CENTERA2
+CFLTFILE
+COMPTAB 
+COMPTYP 
+CRCORR  
+CRMASK  
+CRPIX1  
+CRPIX2  
+CRRADIUS
+CRREJTAB
+CRSIGMAS
+CRSPLIT 
+CRTHRESH
+CRVAL1  
+CRVAL2  
+CTE_NAME
+CTE_VER
+CTEDIR  
+CTEIMAGE
+CTYPE1  
+CTYPE2  
+D2IMFILE
+DARKCORR
+DARKFILE
+DATE    
+DATE-OBS
+DEC_APER
+DEC_TARG
+DETECTOR
+DFLTFILE
+DGEOFILE
+DIRIMAGE
+DQICORR 
+DRIZCORR
+DRKCFILE
+EQUINOX 
+ERRCNT  
+EXPEND  
+EXPFLAG 
+EXPNAME 
+EXPSCORR
+EXPSTART
+EXPTIME 
+EXTEND  
+FGSLOCK 
+FILENAME
+FILETYPE
+FILLCNT 
+FILTER1 
+FILTER2 
+FLASHCUR
+FLASHDUR
+FLASHSTA
+FLATCORR
+FLSHCORR
+FLSHFILE
+FW1ERROR
+FW1OFFST
+FW2ERROR
+FW2OFFST
+FWSERROR
+FWSOFFST
+GCOUNT  
+GLINCORR
+GLOBLIM 
+GLOBRATE
+GOODMAX 
+GOODMEAN
+GOODMIN 
+GRAPHTAB
+GYROMODE
+IDCSCALE
+IDCTAB  
+IDCTHETA
+IDCV2REF
+IDCV3REF
+IMAGETYP
+IMPHTTAB
+INHERIT 
+INITGUES
+INSTRUME
+JWROTYPE
+LFLGCORR
+LFLTFILE
+LINENUM 
+LOSTPIX 
+LRC_FAIL
+LRC_XSTS
+LRFWAVE 
+LTM1_1  
+LTM2_2  
+LTV1    
+LTV2    
+MDECODT1
+MDECODT2
+MDRIZSKY
+MDRIZTAB
+MEANBLEV
+MEANDARK
+MEANEXP 
+MEANFLSH
+MLINTAB 
+MOFFSET1
+MOFFSET2
+MOONANGL
+MTFLAG  
+NAXIS   
+NAXIS1  
+NAXIS2  
+NCOMBINE
+NEXTEND 
+NGOODPIX
+NPOLFILE
+NRPTEXP 
+OBSMODE 
+OBSTYPE 
+OCD1_1  
+OCD1_2  
+OCD2_1  
+OCD2_2  
+OCRPIX1 
+OCRPIX2 
+OCRVAL1 
+OCRVAL2 
+OCTYPE1 
+OCTYPE2 
+OCX10   
+OCX11   
+OCY10   
+OCY11   
+ONAXIS1 
+ONAXIS2 
+OORIENTA
+OPUS_VER
+ORIENTAT
+ORIGIN  
+OSCNTAB 
+P1_ANGLE
+P1_CENTR
+P1_FRAME
+P1_LSPAC
+P1_NPTS 
+P1_ORINT
+P1_PSPAC
+P1_PURPS
+P1_SHAPE
+PA_APER 
+PATTERN1
+PATTSTEP
+PA_V3   
+PCOUNT  
+PCTECORR
+PCTEFRAC
+PCTENSMD
+PCTERNCL
+PCTESHFT
+PCTESMIT
+PCTETAB 
+PFLTFILE
+PHOTBW  
+PHOTCORR
+PHOTFLAM
+PHOTMODE
+PHOTPLAM
+PHOTTAB 
+PHOTZPT 
+PODPSFF 
+POSTARG1
+POSTARG2
+PRIMESI 
+PR_INV_F
+PR_INV_L
+PR_INV_M
+PROCTIME
+PROPAPER
+PROPOSID
+QUALCOM1
+QUALCOM2
+QUALCOM3
+QUALITY 
+RA_APER 
+RA_TARG 
+READNSEA
+READNSEB
+READNSEC
+READNSED
+REFFRAME
+REJ_RATE
+RPTCORR 
+SCALENSE
+SCLAMP  
+SDQFLAGS
+SHADCORR
+SHADFILE
+SHUTRPOS
+SIMPLE  
+SIZAXIS1
+SIZAXIS2
+SKYSUB  
+SKYSUM  
+SNRMAX  
+SNRMEAN 
+SNRMIN  
+SOFTERRS
+SPOTTAB 
+STATFLAG
+STDCFFF 
+STDCFFP 
+SUBARRAY
+SUN_ALT 
+SUNANGLE
+TARGNAME
+TDDALPHA
+TDDBETA 
+TELESCOP
+TIME-OBS
+T_SGSTAR
+VAFACTOR
+WCSAXES 
+WCSCDATE
+WFCMPRSD
+WRTERR  
+XTENSION
+################################################################################
+#
+# Header Keyword Rules
+#
+################################################################################
+APERTURE  APERTURE  multi
+DETECTOR  DETECTOR  multi
+EXPEND    EXPEND    max
+EXPSTART  EXPSTART  min
+EXPTIME   TEXPTIME  sum
+EXPTIME   EXPTIME   sum
 FILTER1   FILTER1   multi
 FILTER2   FILTER2   multi
-FILTER    FILTER    multi
-LRFWAVE   LRFWAVE   multi
-
-
-INSTRUME 
-                                                                    
-ROOTNAME  ROOTNAME
-EXTNAME
-EXTVER
-
-IMAGETYP  IMAGETYP
-PRIMESI   PRIMESI 
-
-TARGNAME  TARGNAME
-RA_TARG   RA_TARG 
-DEC_TARG  DEC_TARG
-
-/ PROPOSAL INFORMATION                                            
-
-SUNANGLE 
-MOONANGL
-SUN_ALT 
-
-<delete>  FGSLOCK 
-<delete>  GYROMODE
-<delete>  REFFRAME
-<delete>  MTFLAG  
-                  
-DATE-OBS  DATE-OBS
-TIME-OBS  TIME-OBS
-EXPSTART  EXPSTART  
-EXPEND    EXPEND    
-EXPTIME   EXPTIME 
-EXPFLAG   EXPFLAG   
-       
-PA_V3     PA_V3   
-       
-POSTARG1  POSTARG1
-POSTARG2  POSTARG2       
-       
-OBSTYPE   OBSTYPE 
-OBSMODE   OBSMODE 
-#SUBARRAY  SUBARRAY # boolean keywords not currently supported
-DETECTOR  DETECTOR
-FILTER1   FILTER1 
-FILTER2   FILTER2 
-LRFWAVE   LRFWAVE 
-
-/ CALIBRATION REFERENCE FILES                                 
-              
-/ PATTERN KEYWORDS                                                
-              
-/ POST FLASH  PARAMETERS                                          
-       
-/ CALIBRATED ENGINEERING PARAMETERS 
-                           
-ASN_ID    ASN_ID  
-ASN_TAB   ASN_TAB 
-ASN_MTYP  ASN_MTYP
-DISTNAME  DISTNAME
-SIPNAME   SIPNAME 
-UPWCSVER  UPWCSVER
-PYWCSVER  PYWCSVER
-
-################################################################################
-#
-# Extension header keyword rules
-#
-################################################################################
-EXPNAME   EXPNAME  first            
-BUNIT     BUNIT    first
-WCSAXES   WCSAXES   first
-CRPIX1    CRPIX1    first 
-CRPIX2    CRPIX2     first
-CRVAL1    CRVAL1     first
-CRVAL2    CRVAL2     first
-CTYPE1    CTYPE1     first
-CTYPE2    CTYPE2     first
-CD1_1     CD1_1      first
-CD1_2     CD1_2      first
-CD2_1     CD2_1      first
-CD2_2     CD2_2      first
-LTV1      LTV1       first
-LTV2      LTV2       first
-LTM1_1    LTM1_1     first
-LTM2_2    LTM2_2     first
-ORIENTAT  ORIENTAT   first
-VAFACTOR  VAFACTOR   first
-WCSNAME   WCSNAME    first
-
-PHOTMODE  PHOTMODE  first
-PHOTFLAM  PHOTFLAM  mean
-PHOTZPT   PHOTZPT   mean
-PHOTPLAM  PHOTPLAM  mean
+GOODMAX   GOODMAX   max
+GOODMEAN  GOODMEAN  mean
+GOODMIN   GOODMIN   min
+INHERIT   INHERIT   first # maintain IRAF compatibility
+INSTRUME  INSTRUME  multi
+LRFWAVE   LRFWAVE   first
+NCOMBINE  NCOMBINE  sum
+MDRIZSKY  MDRIZSKY  mean
 PHOTBW    PHOTBW    mean
-                                                
-EXPNAME   EXPNAME              
-CCDCHIP   CCDCHIP 
-                                                                             
-CRPIX1    CRPIX1  
-CRPIX2    CRPIX2  
-CRVAL1    CRVAL1  
-CRVAL2    CRVAL2  
-CTYPE1    CTYPE1  
-CTYPE2    CTYPE2  
-CD1_1     CD1_1   
-CD1_2     CD1_2   
-CD2_1     CD2_1   
-CD2_2     CD2_2   
-LTV1      LTV1    
-LTV2      LTV2    
-LTM1_1    LTM1_1  
-LTM2_2    LTM2_2  
-ORIENTAT  ORIENTAT
-RA_APER   RA_APER 
-DEC_APER  DEC_APER
-PA_APER   PA_APER 
-VAFACTOR  VAFACTOR
-WCSNAME
-
-<delete> / REPEATED EXPOSURES INFO
-
-<delete> / ON-BOARD COMPRESSION INFORMATION
-     
-/ READOUT DEFINITION PARAMETERS                                   
-
-PHOTMODE  PHOTMODE  
-PHOTFLAM  PHOTFLAM
-PHOTZPT   PHOTZPT 
-PHOTPLAM  PHOTPLAM
-PHOTBW    PHOTBW  
-
-/ DATA PACKET INFORMATION                                         
-       
-CD1_1O    CD1_1O 
-CD1_2O    CD1_2O 
-CD2_2O    CD2_2O 
-CD2_1O    CD2_1O  
-OORIENTA  OORIENTA
-WCSCDATE  WCSCDATE
-OCX10     OCX10   
-OCX11     OCX11   
-OCY10     OCY10   
-OCY11     OCY11   
-TDDALPHA  TDDALPHA
-TDDBETA   TDDBETA 
-WCSNAMEO  WCSNAMEO
-WCSAXESO  WCSAXESO
-CRPIX1O   CRPIX1O 
-CRPIX2O   CRPIX2O 
-CDELT1O   CDELT1O 
-CDELT2O   CDELT2O 
-CUNIT1O   CUNIT1O 
-CUNIT2O   CUNIT2O 
-CTYPE1O   CTYPE1O 
-CTYPE2O   CTYPE2O 
-CRVAL1O   CRVAL1O 
-CRVAL2O   CRVAL2O 
-LONPOLEO  LONPOLEO
-LATPOLEO  LATPOLEO
-WCSNAME   WCSNAME 
-
-MDRIZSKY  MDRIZSKY
-
-<delete> / OTFR KEYWORDS
-<delete> / CALIBRATION SWITCHES: PERFORM, OMIT, COMPLETE
-<delete> / COSMIC RAY REJECTION ALGORITHM PARAMETERS 
-<delete>  CBLKSIZE
-
+PHOTFLAM  PHOTFLAM  mean
+PHOTMODE  PHOTMODE  multi
+PHOTPLAM  PHOTPLAM  mean
+PHOTZPT   PHOTZPT   mean
+PROPOSID  PROPOSID  first
+SNRMAX    SNRMAX    max
+SNRMEAN   SNRMEAN   mean
+SNRMIN    SNRMIN    min
+TARGNAME  TARGNAME  multi
+TELESCOP  TELESCOP  multi
