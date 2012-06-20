@@ -40,10 +40,25 @@ def multi(vals):
     if num_vals > 1:
         return "MULTIPLE"
 
+def multi1(vals):
+    """
+    This will either return the common value from a list of identical values
+    or the single character '?'
+    """
+    uniq_vals = list(set(vals))
+    num_vals = len(uniq_vals)
+    if num_vals == 0:
+        return None
+    if num_vals == 1:
+        return uniq_vals[0]
+    if num_vals > 1:
+        return "?"
+
 # translation dictionary for function entries from rules files
 blender_funcs = {'first':blender.first,
                 'last':blender.last,
                 'multi':multi,
+                'multi?':multi1,
                 'mean':np.mean,
                 'sum':np.sum,
                 'max':np.max,
