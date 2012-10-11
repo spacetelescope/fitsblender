@@ -379,7 +379,7 @@ CRSIGMAS    CRSIGMAS    multi
 CRSPLIT    CRSPLIT    first
 CRTHRESH    CRTHRESH    first
 CTEDIR      CTEDIR      multi
-CTEIMAGE    CTEIMAGE    multi
+CTEIMAGE    CTEIMAGE    first
 CTYPE1    CTYPE1    multi
 CTYPE2    CTYPE2    multi
 CRVAL1    CRVAL1    first
@@ -390,7 +390,7 @@ DATE-OBS    DATE-OBS    first
 DEC_APER    DEC_APER    first
 DEC_TARG    DEC_TARG    first
 DELTATIM    DELTATIM    first
-DETECTOR    DETECTOR    multi
+DETECTOR    DETECTOR    first
 DFLTFILE    DFLTFILE    multi
 DGEOFILE    DGEOFILE    multi
 DIRIMAGE    DIRIMAGE    multi
@@ -433,7 +433,7 @@ MEANEXP    MEANEXP    first
 MEANFLSH    MEANFLSH    first
 MOONANGL  MOONANGL      first
 MTFLAG      MTFLAG    first
-NCOMBINE    NCOMBINE    first
+NCOMBINE    NCOMBINE    sum
 NLINCORR    NLINCORR    multi
 NLINFILE    NLINFILE    multi
 NRPTEXP    NRPTEXP    first
