@@ -348,7 +348,7 @@ XTENSION
 #
 ################################################################################
 APERTURE  APERTURE  multi
-DETECTOR  DETECTOR  multi?
+DETECTOR  DETECTOR  first
 EXPEND    EXPEND    max
 EXPSTART  EXPSTART  min
 EXPTIME   TEXPTIME  sum
@@ -373,7 +373,7 @@ SNRMAX    SNRMAX    max
 SNRMEAN   SNRMEAN   mean
 SNRMIN    SNRMIN    min
 TARGNAME  TARGNAME  multi
-TELESCOP  TELESCOP  multi?
+TELESCOP  TELESCOP  first
 ### rules below were added 05Jun2012,in response to Dorothy Fraquelli guidance re: DADS
 ATODCORR  ATODCORR  multi
 ATODGNA   ATODGNA   first
@@ -396,13 +396,13 @@ CCDTAB      CCDTAB    multi
 CFLTFILE  CFLTFILE  multi
 COMPTAB   COMPTAB   multi
 CRCORR      CRCORR    multi
-CRMASK      CRMASK    multi?
+CRMASK      CRMASK    first
 CRRADIUS  CRRADIUS  first
 CRREJTAB  CRREJTAB  multi
 CRSPLIT   CRSPLIT   first
 CRTHRESH  CRTHRESH  first
 CTEDIR      CTEDIR    multi
-CTEIMAGE  CTEIMAGE  multi?
+CTEIMAGE  CTEIMAGE  first
 DARKCORR  DARKCORR  multi
 DARKFILE  DARKFILE  multi
 DATE-OBS  DATE-OBS  first
@@ -439,7 +439,7 @@ MEANEXP   MEANEXP   first
 MOONANGL  MOONANGL  first
 NRPTEXP   NRPTEXP   first
 OBSMODE   OBSMODE   multi
-OBSTYPE   OBSTYPE   multi
+OBSTYPE   OBSTYPE   first
 OSCNTAB   OSCNTAB   multi
 P1_ANGLE  P1_ANGLE  first
 P1_CENTR  P1_CENTR  multi?
