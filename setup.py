@@ -1,24 +1,16 @@
 #!/usr/bin/env python
 
-from __future__ import division # confidence high
-
-# We use the local copy of stsci_distutils_hack, unless
-# the user asks for the stpytools version
-
-######################################################################
-# PyFITS
 try:
-    import pyfits
+    from setuptools import setup
 except ImportError:
-    print "WARNING: PyFITS must be installed to use pywcs."
-    print "         Since this is not a build-time dependency, the "
-    print "         build will proceed."
+    from distribute_setup import use_setuptools
+    use_setuptools()
+    from setuptools import setup
 
-import os
-if os.getenv("USE_STPYTOOLS") :
-    import pytools.stsci_distutils_hack as H
-else :
-    import stsci_distutils_hack as H
-
-H.run()
-
+setup(
+    setup_requires=['d2to1>=0.2.7', 'stsci.distutils>=0.3'],
+    packages=['stsci'],
+    d2to1=True,
+    use_2to3=True,
+    zip_safe=False
+)

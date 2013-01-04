@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## this is obsolete - see setup.cfg
+
 from __future__ import division # confidence high
 
 CONTACT = "Michael Droettboom"
