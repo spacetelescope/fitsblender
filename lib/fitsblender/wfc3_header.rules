@@ -1,4 +1,4 @@
-!VERSION = 1.0
+!VERSION = 1.1
 !INSTRUMENT = WFC3
 ################################################################################
 #
@@ -515,7 +515,7 @@ SUBARRAY    SUBARRAY    first
 SUBTYPE    SUBTYPE    multi
 SUNANGLE   SUNANGLE   first
 T_SGSTAR    T_SGSTAR    multi?
-TARGNAME    TARGNAME    multi
+TARGNAME    TARGNAME    first
 TDFTRANS    TDFTRANS    sum
 TELESCOP    TELESCOP    first
 TIME-OBS    TIME-OBS    first
