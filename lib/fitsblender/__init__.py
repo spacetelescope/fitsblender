@@ -40,31 +40,7 @@ from stsci.tools import teal
 
 teal.print_tasknames(__name__, os.path.dirname(__file__))
 
-# Begin Version Information -------------------------------------------
-if False :
-    __version__ = ''
-    __svn_version__ = 'Unable to determine SVN revision'
-    __full_svn_info__ = ''
-    __setup_datetime__ = None
-
-    try:
-        __version__ = __import__('pkg_resources').\
-                            get_distribution('fitsblender').version
-    except:
-        pass
-
-else :
-    __version__ = '1.0.0'
+from .version import *
 
 __vdate__ = '01-Mar-2012'
-
-
-# Revision based version info
-# End Version Information ---------------------------------------------
-try:
-    from fitsblender.svninfo import (__svn_version__, __full_svn_info__,
-                                     __setup_datetime__)
-except ImportError:
-    pass
-
 
