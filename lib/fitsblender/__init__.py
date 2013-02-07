@@ -42,5 +42,3 @@ teal.print_tasknames(__name__, os.path.dirname(__file__))
 
 from .version import *
 
-__vdate__ = '01-Mar-2012'
-
