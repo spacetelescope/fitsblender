@@ -806,7 +806,7 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
                 # there may or may not be a second type of extension in the template
                 count = 0
                 for f in ftemplate:
-                    if f.header.has_key('extname') and f.header['extname'] == extlist[1]:
+                    if 'extname' in f.header and f.header['extname'] == extlist[1]:
                         count += 1
                 if count > 0:
                     extnum = (extlist[1],fnum)
@@ -827,7 +827,7 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
             else:
                 count = 0
                 for f in ftemplate:
-                    if f.header.has_key('extname') and f.header['extname'] == extlist[2]:
+                    if 'extname' in f.header and f.header['extname'] == extlist[2]:
                         count += 1
                 if count > 0:
                     extnum = (extlist[2],fnum)
