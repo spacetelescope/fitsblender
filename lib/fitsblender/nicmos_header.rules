@@ -421,7 +421,7 @@ IDCTAB    IDCTAB    multi
 IMAGETYP    IMAGETYP    first
 INHERIT    INHERIT    first # maintains IRAF compatibility
 INITGUES    INITGUES    multi
-INSTRUME    INSTRUME    multi
+INSTRUME    INSTRUME    first
 LFLTFILE    LFLTFILE    multi
 LINENUM    LINENUM    first
 LTM1_1    LTM1_1    first

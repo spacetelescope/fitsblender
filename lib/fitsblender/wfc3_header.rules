@@ -407,8 +407,8 @@ EXPTIME      TEXPTIME    sum
 EXTVER    EXTVER    first
 FGSLOCK    FGSLOCK    multi
 FILENAME    FILENAME    multi
-FILETYPE    FILETYPE    multi?
-FILTER    FILTER    multi?
+FILETYPE    FILETYPE    multi
+FILTER    FILTER    multi
 FLASHCUR    FLASHCUR    first
 FLASHDUR    FLASHDUR    first
 FLASHSTA    FLASHSTA    first
@@ -416,12 +416,12 @@ FLATCORR    FLATCORR    multi
 FLSHCORR    FLSHCORR    multi
 FLSHFILE    FLSHFILE    multi
 GRAPHTAB    GRAPHTAB    multi
-GYROMODE    GYROMODE    multi?
+GYROMODE    GYROMODE    multi
 IDCTAB    IDCTAB    multi
 IMAGETYP    IMAGETYP    first
 INHERIT    INHERIT    first # maintains IRAF compatibility
-INITGUES    INITGUES    multi?
-INSTRUME    INSTRUME    multi?
+INITGUES    INITGUES    multi
+INSTRUME    INSTRUME    first
 LFLTFILE    LFLTFILE    multi
 LINENUM    LINENUM    first
 LTM1_1    LTM1_1    first
@@ -444,7 +444,7 @@ OPUS_VER    OPUS_VER    first
 ORIENTAT    ORIENTAT    first
 OSCNTAB    OSCNTAB    multi
 P1_ANGLE    P1_ANGLE    first
-P1_CENTR    P1_CENTR    multi?
+P1_CENTR    P1_CENTR    multi
 P1_FRAME    P1_FRAME    multi
 P1_LSPAC    P1_LSPAC    first
 P1_NPTS    P1_NPTS    first
@@ -453,7 +453,7 @@ P1_PSPAC    P1_PSPAC    first
 P1_PURPS    P1_PURPS    multi
 P1_SHAPE    P1_SHAPE    multi
 P2_ANGLE    P2_ANGLE    first
-P2_CENTR    P2_CENTR    multi?
+P2_CENTR    P2_CENTR    multi
 P2_FRAME    P2_FRAME    multi
 P2_LSPAC    P2_LSPAC    first
 P2_NPTS     P2_NPTS    first
@@ -474,11 +474,11 @@ PHOTFNU    PHOTFNU      mean
 PHOTMODE    PHOTMODE    first
 PHOTPLAM    PHOTPLAM    mean
 PHOTZPT        PHOTZPT        mean
-PODPSFF    PODPSFF    multi?
+PODPSFF    PODPSFF    multi
 PR_INV_F    PR_INV_F    first
 PR_INV_L    PR_INV_L    first
 PR_INV_M    PR_INV_M    first
-PRIMESI        PRIMESI        multi?
+PRIMESI        PRIMESI        multi
 PROCTIME    PROCTIME    first
 PROPAPER    PROPAPER    multi
 PROPOSID    PROPOSID    first
@@ -509,12 +509,12 @@ SHADFILE    SHADFILE    multi
 SIZAXIS1    SIZAXIS1    first
 SIZAXIS2    SIZAXIS2    first
 SOFTERRS    SOFTERRS    sum
-STDCFFF    STDCFFF    multi?
-STDCFFP    STDCFFP    multi?
+STDCFFF    STDCFFF    multi
+STDCFFP    STDCFFP    multi
 SUBARRAY    SUBARRAY    first
 SUBTYPE    SUBTYPE    multi
 SUNANGLE   SUNANGLE   first
-T_SGSTAR    T_SGSTAR    multi?
+T_SGSTAR    T_SGSTAR    multi
 TARGNAME    TARGNAME    first
 TDFTRANS    TDFTRANS    sum
 TELESCOP    TELESCOP    first
