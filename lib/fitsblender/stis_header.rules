@@ -424,8 +424,8 @@ INITGUES    INITGUES    multi
 INSTRUME    INSTRUME    first
 LFLTFILE    LFLTFILE    multi
 LINENUM    LINENUM    first
-LTM1_1    LTM1_1    first
-LTM2_2    LTM2_2    first
+LTM1_1    LTM1_1    float_one
+LTM2_2    LTM2_2    float_one
 LTV1    LTV1    first
 LTV2    LTV2    first
 MDRIZTAB    MDRIZTAB    multi

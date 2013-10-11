@@ -18,7 +18,7 @@ __vdate__ = '09-May-2012'
 # Version of rules file format supported by this version of the code
 # All changes should be backwards compatible to older rules versions
 # so any rules file with Version >= __rules_version__ should work with this code
-__rules_version__ = 1.0
+__rules_version__ = 1.1
 
 fits_required_bool_kws = ['SIMPLE','EXTEND']
 WCS_KEYWORDS=['CD1_1','CD1_2', 'CD2_1', 'CD2_2', 'CRPIX1',
@@ -54,9 +54,27 @@ def multi1(vals):
     if num_vals > 1:
         return "?"
 
+def float_one(vals):
+    """ Return a constant floating point value of 1.0
+    """
+    return 1.0
+
+def int_one(vals):
+    """ Return an integer value of 1
+    """
+    return int(1)
+
+def zero(vals):
+    """ Return a value of 0
+    """
+    return 0
+
 # translation dictionary for function entries from rules files
 blender_funcs = {'first':blender.first,
                 'last':blender.last,
+                'float_one': float_one,
+                'int_one': int_one,
+                'zero': zero,
                 'multi':multi,
                 'multi?':multi1,
                 'mean':np.mean,
@@ -309,6 +327,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
         if inst not in icache:
             # initialize the appropriate class for this data's instrument
             inst_class = KeywordRules(inst.lower())
+            print "Found RULEFILE for ",inst.lower(),' of: ',inst_class.rules_file
             # Interpret rules for this class based on image that
             # initialized this instrument's rules
             inst_class.interpret_rules(hlist)
