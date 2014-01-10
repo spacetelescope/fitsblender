@@ -12,8 +12,8 @@ from stsci.tools import fileutil, textutil, parseinput
 from . import blender
 
 __taskname__ = 'blendheaders' # unless someone comes up with anything better
-__version__ = '1.0.2'
-__vdate__ = '09-May-2012'
+__version__ = '1.0.3'
+__vdate__ = '27-Dec-2013'
 
 # Version of rules file format supported by this version of the code
 # All changes should be backwards compatible to older rules versions
@@ -245,6 +245,9 @@ def blendheaders(drzfile, inputs=None, output=None,
 
         # Now append table with remaining header keyword values
         drzimg.append(newtab)
+
+        if 'nextend' in drzimg[0].header:
+            drzimg[0].header['nextend'] = len(drzimg)-1
 
         # Write out the updated product
         if open_mode == 'update':
