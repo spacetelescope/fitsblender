@@ -772,41 +772,17 @@ def remove_distortion_keywords(hdr):
             del hdr[k[0]]
     # Remove paper IV related keywords related to the
     #   DGEO correction here
-
-    # ORIGINAL CODE (Temporary not working due to a bug in PyFITS):
-    #if (k[0][:2] == 'DP'):
-        #del hdr[k[0]+'*']
-        #del hdr[k[0]+'.*']
-        #del hdr[k[0]+'.*.*']
-    #if (k[0][:2] == 'CP'):
-        #del hdr[k[0]]
-
-    # TEMPORARY WORKAROUND:
-    if (k[0][:2] == 'DP'):
-        try:
-            del hdr[k[0]+'*']
-        except:
-            print "ERROR (bleandheaders.remove_distortion_keywords) trying to delete \'{:s}\' in the header.".format(k[0]+'*')
-            pass
-
-        try:
-            del hdr[k[0]+'.*']
-        except:
-            print "ERROR (bleandheaders.remove_distortion_keywords) trying to delete \'{:s}\' in the header.".format(k[0]+'.*')
-            pass
-
-        try:
-            del hdr[k[0]+'.*.*']
-        except:
-            print "ERROR (bleandheaders.remove_distortion_keywords) trying to delete \'{:s}\' in the header.".format(k[0]+'.*.*')
-            pass
-
-    if (k[0][:2] == 'CP'):
-        try:
+    for k in hdr.items():
+        if (k[0][:2] == 'DP'):
+            try:
+                del hdr[k[0]+'*']
+                del hdr[k[0]+'.*']
+                del hdr[k[0]+'.*.*']
+            except:
+                print "ERROR (bleandheaders.remove_distortion_keywords) trying to delete \'{:s}\' in the header.".format(k[0]+'*')
+                pass
+        if (k[0][:2] == 'CP'):
             del hdr[k[0]]
-        except:
-            print "ERROR (bleandheaders.remove_distortion_keywords) trying to delete \'{:s}\' in the header.".format('CP')
-            pass
 
 
 def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
