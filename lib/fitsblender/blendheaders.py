@@ -5,15 +5,15 @@ import os
 import glob
 
 import numpy as np
-import pyfits
+import astropy.io.fits as pyfits
 
 from stsci.tools import fileutil, textutil, parseinput
 
 from . import blender
 
 __taskname__ = 'blendheaders' # unless someone comes up with anything better
-__version__ = '1.0.3'
-__vdate__ = '27-Dec-2013'
+__version__ = '1.1.0'
+__vdate__ = '27-Apr-2014'
 
 # Version of rules file format supported by this version of the code
 # All changes should be backwards compatible to older rules versions

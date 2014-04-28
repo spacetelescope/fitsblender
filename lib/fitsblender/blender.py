@@ -30,7 +30,7 @@
 
 import numpy as np
 from numpy import ma
-import pyfits
+import astropy.io.fits as pyfits
 
 class _KeywordMapping:
     """
