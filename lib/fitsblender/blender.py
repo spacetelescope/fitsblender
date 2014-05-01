@@ -30,7 +30,7 @@
 
 import numpy as np
 from numpy import ma
-import astropy.io.fits as pyfits
+from astropy.io import fits
 
 class _KeywordMapping:
     """
@@ -83,7 +83,7 @@ def fitsblender(headers, spec):
 
     - *headers* is a sequence where each element is either:
 
-      - a `pyfits.Header` instance
+      - a `astropy.io.fits.Header` instance
 
       - a 2-tuple of the form (*filename*, *extension*), where
         *filename* is a path to a FITS file and *extension* is an
@@ -176,13 +176,13 @@ def fitsblender(headers, spec):
     # Read in data
     for header in headers:
         hdulist = None
-        if not isinstance(header, pyfits.Header):
+        if not isinstance(header, fits.Header):
             if not isinstance(header, tuple) and len(header) == 2:
                 raise TypeError(
                     "Each entry in the headers list must be either a " +
-                    "pyfits.Header instance or a 2-tuple")
+                    "fits.Header instance or a 2-tuple")
             filename, ext = header
-            hdulist = pyfits.open(filename)
+            hdulist = fits.open(filename)
             header = hdulist[ext].header
 
         for i, mapping in enumerate(mappings):

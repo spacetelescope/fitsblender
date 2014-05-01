@@ -5,7 +5,7 @@ import os
 import glob
 
 import numpy as np
-import astropy.io.fits as pyfits
+from astropy.io import fits
 
 from stsci.tools import fileutil, textutil, parseinput
 
@@ -194,7 +194,7 @@ def blendheaders(drzfile, inputs=None, output=None,
         open_mode='update'
         if output not in [None,'',' ','INDEF','None']:
             open_mode = 'readonly'
-        drzimg = pyfits.open(drzfile,mode=open_mode)
+        drzimg = fits.open(drzfile,mode=open_mode)
 
         # Determine whether we are working with a simple DRZ FITS file or
         # a full multi-extension DRZ FITS file.
@@ -206,30 +206,30 @@ def blendheaders(drzfile, inputs=None, output=None,
         else:
             # We are working with a full MEF file, so update all extension headers
             for i,extn in enumerate(drzimg):
-                if isinstance(extn, pyfits.BinTableHDU):
+                if isinstance(extn, fits.BinTableHDU):
                     break
                 # Update new headers with correct array sizes
-                if isinstance(extn, pyfits.ImageHDU):
+                if isinstance(extn, fits.ImageHDU):
                     extn_naxis = extn.header['NAXIS']
-                    newhdrs[i].update('NAXIS',extn_naxis)
-                    newhdrs[i].update('BITPIX',extn.header['BITPIX'])
+                    newhdrs[i]['NAXIS'] = extn_naxis
+                    newhdrs[i]['BITPIX'] = extn.header['BITPIX']
                     for card in newhdrs[i]['naxis*']:
                         if len(card.key) > 5: # naxisj keywords
                             if extn_naxis > 0:
-                                newhdrs[i].update(card.key, extn.header[card.key])
+                                newhdrs[i][card.keyword] = extn.header[card.keyword]
                             else:
-                                del newhdrs[i][card.key]
-                    newhdrs[i].update('EXTNAME', extn.header['EXTNAME'],after='ORIGIN')
-                    newhdrs[i].update('EXTVER', extn.header['EXTVER'],after='EXTNAME')
+                                del newhdrs[i][card.keyword]
+                    newhdrs[i].set('EXTNAME', value=extn.header['EXTNAME'], after='ORIGIN')
+                    newhdrs[i].set('EXTVER', value=extn.header['EXTVER'], after='EXTNAME')
                     for kw in WCS_KEYWORDS:
                         if kw in extn.header:
-                            newhdrs[i].update(kw,extn.header[kw])
-                if isinstance(extn, pyfits.PrimaryHDU):
+                            newhdrs[i][kw] = extn.header[kw]
+                if isinstance(extn, fits.PrimaryHDU):
                     for card in extn.header['exp*']:
-                        newhdrs[i].update(card.key,card.value)
-                    newhdrs[i].update('NEXTEND',len(drzimg)-1)
-                    newhdrs[i].update('ROOTNAME',extn.header['rootname'])
-                    newhdrs[i].update('BITPIX',extn.header['bitpix'])
+                        newhdrs[i][card.keyword] = card.value
+                    newhdrs[i]['NEXTEND'] = len(drzimg) - 1
+                    newhdrs[i]['ROOTNAME'] = extn.header['rootname']
+                    newhdrs[i]['BITPIX'] = extn.header['bitpix']
                     # Determine which keywords are included in the table but not
                     # the new dict(header). These will be removed from the output
                     # header altogether
@@ -239,7 +239,7 @@ def blendheaders(drzfile, inputs=None, output=None,
                     del_kws.append('HISTORY')
                     for kw in extn.header:
                         if kw not in newhdrs[i] and kw not in del_kws:
-                            newhdrs[i].update(kw,extn.header[kw])
+                            newhdrs[i][kw] = extn.header[kw]
 
                 extn.header = newhdrs[i]
 
@@ -271,7 +271,8 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
     ----------
     inputs : list
         Either a single list of filenames from which to extract the headers to
-        be blended, or a list of lists of pyfits.Header objects to be blended.
+        be blended, or a list of lists of `astropy.io.fits.Header` objects
+        to be blended.
 
     Returns
     -------
@@ -280,7 +281,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
         the input image list or one for each set of headers provided as input
 
     new_table : object
-        Single pyfits.TableHDU object that contains the combined results from
+        Single fits.TableHDU object that contains the combined results from
         all input headers(extension). Each row will correspond to an image,
         and each column corresponds to a single keyword listed in the rules.
 
@@ -368,7 +369,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
 
     if len(newtab) > 0:
         # Now merge the results for all the tables into a single table extension
-        new_table = pyfits.new_table(newtab)
+        new_table = fits.new_table(newtab)
         new_table.header['EXTNAME'] = 'HDRTAB'
     else:
         new_table = None
@@ -525,8 +526,8 @@ class KeywordRules(object):
             Primary, SCI, WHT, CTX,...
 
             This method returns the new header and summary table
-            as pyfits.Header and numpy.ndarray masked array or
-            pyfits.binTableHDU objects
+            as `astropy.io.fits.Header` and numpy.ndarray masked array or
+            fits.binTableHDU objects
         """
         # Apply rules to headers
         fbdict,fbtab = blender.fitsblender(headers,self.rules)
@@ -568,12 +569,11 @@ class KeywordRules(object):
         # update each extension separately without making copies of kws from
         # one extension to another.
         for kw in fbdict:
-            new_header.update(kw,fbdict[kw],savecomment=True)
-
+            new_header[kw] = fbdict[kw]
         # Create summary table
         if len(tabcols) > 0:
             if tabhdu:
-                new_table = pyfits.new_table(fbtab)
+                new_table = fits.new_table(fbtab)
                 new_table.header['EXTNAME'] = 'HDRTAB'
             else:
                 new_table = fbtab
@@ -587,9 +587,9 @@ class KeywordRules(object):
         rules used to create this header. Only non-comment lines from the
         rules file will be reported.
         """
-        hdr.update('RULESVER',self.rules_version,comment='Version ID for header kw rules file')
-        hdr.update('BLENDVER',__version__,comment='Version of blendheader software used')
-        hdr.update('RULEFILE',self.rules_file,comment='Name of header kw rules file')
+        hdr['RULESVER'] = (self.rules_version, 'Version ID for header kw rules file')
+        hdr['BLENDVER'] = (__version__, 'Version of blendheader software used')
+        hdr['RULEFILE'] = (self.rules_file, 'Name of header kw rules file')
         hdr.add_history('='*60)
         hdr.add_history('Header Generation rules:')
         hdr.add_history('    Rules used to combine headers of input files')
@@ -762,8 +762,8 @@ def remove_distortion_keywords(hdr):
 
     # Remove '-SIP' from CTYPE for output product
     if 'ctype1' in hdr and hdr['ctype1'].find('SIP') > -1:
-            hdr.update('ctype1', hdr['ctype1'][:-4])
-            hdr.update('ctype2',hdr['ctype2'][:-4])
+            hdr['ctype1'] = hdr['ctype1'][:-4]
+            hdr['ctype2'] = hdr['ctype2'][:-4]
 
     # Remove SIP coefficients from DRZ product
     for k in hdr.items():
@@ -790,8 +790,10 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
     # Obtain default headers for output file based on a single input file
     # (Copied from outputimage module.)
     #
-    # NOTE: Returns 'pyfits.Header' objects, not HDU objects!
-    #
+    Returns
+    -------
+    headers :  tuple of `astropy.io.fits.Header` objects, not HDU objects!
+        headers
     """
 
     if fname is None:
@@ -820,7 +822,7 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
             extnum = fileutil.findKeywordExtn(ftemplate,_extkey,extlist[0])
         else:
             extnum = (extlist[0],fnum)
-        scihdr = pyfits.Header(cards=ftemplate[extnum].header.ascard.copy())
+        scihdr = fits.Header(cards=ftemplate[extnum].header.ascard.copy())
         #scihdr.update('extver',1)
         extnum_sci = extnum
 
@@ -842,9 +844,9 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
         else:
             extnum = extnum_sci
 
-        errhdr = pyfits.Header(cards=ftemplate[extnum].header.ascard.copy())
+        errhdr = fits.Header(cards=ftemplate[extnum].header.ascard.copy())
         #errhdr.update('extver',1)
-        errhdr.update('bunit','UNITLESS')
+        errhdr['bunit'] = 'UNITLESS'
 
         if len(extlist) > 2 and extlist[2] not in [None,'',' ','INDEF','None']:
 
@@ -863,9 +865,9 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
         else:
             extnum = extnum_sci
 
-        dqhdr = pyfits.Header(cards=ftemplate[extnum].header.ascard.copy())
+        dqhdr = fits.Header(cards=ftemplate[extnum].header.ascard.copy())
         #dqhdr.update('extver',1)
-        dqhdr.update('bunit','UNITLESS')
+        dqhdr['bunit'] = 'UNITLESS'
 
     else:
         # Create default headers from scratch
@@ -876,7 +878,7 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
     ftemplate.close()
     del ftemplate
 
-    return prihdr,scihdr,errhdr,dqhdr
+    return prihdr, scihdr, errhdr, dqhdr
 
 def merge_tables_by_cols(tables):
     """
@@ -915,19 +917,19 @@ def merge_tables_by_cols(tables):
 
 def cat_headers(hdr1,hdr2):
     """
-    Create new pyfits.Header object from concatenating 2 input Headers
+    Create new `astropy.io.fits.Header` object from concatenating 2 input Headers
     """
     nhdr = hdr1.copy().ascard
     for c in hdr2.ascard:
         nhdr.append(c)
 
-    return pyfits.Header(nhdr)
+    return fits.Header(nhdr)
 
 def extract_filenames_from_drz(drzfile):
     """
     Returns the list of filenames with extensions of input chips that was
     used to generate the drizzle product.
     """
-    phdr = pyfits.getheader(drzfile)
+    phdr = fits.getheader(drzfile)
     fnames = phdr['D0*DATA'].values()
     return fnames
