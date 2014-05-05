@@ -214,14 +214,11 @@ def blendheaders(drzfile, inputs=None, output=None,
                     newhdrs[i]['NAXIS'] = extn_naxis
                     newhdrs[i]['BITPIX'] = extn.header['BITPIX']
                     for card in newhdrs[i]['naxis*']:
-                        if len(card.keyword) > 5: # naxisj keywords
+                        if len(card.key) > 5: # naxisj keywords
                             if extn_naxis > 0:
                                 newhdrs[i][card.keyword] = extn.header[card.keyword]
                             else:
-                                try:
-                                    del newhdrs[i][card.keyword]
-                                except KeyError:
-                                    pass
+                                del newhdrs[i][card.keyword]
                     newhdrs[i].set('EXTNAME', value=extn.header['EXTNAME'], after='ORIGIN')
                     newhdrs[i].set('EXTVER', value=extn.header['EXTVER'], after='EXTNAME')
                     for kw in WCS_KEYWORDS:
@@ -557,6 +554,7 @@ class KeywordRules(object):
 
         # Remove section names from output header(s)
         for name in self.section_names:
+            #for indx,kw in zip(range(len(new_header),0,-1),new_header.ascard[-1::-1]):
             for indx,kw in zip(range(len(new_header),0,-1),new_header[-1::-1]):
                 if name in str(kw.value):
                     del new_header[indx-1]
@@ -740,6 +738,7 @@ def find_keywords_in_section(hdr,title):
         return None
 
     # Now, extract the keyword names from this section
+    #section_keys = hdr.ascard[sect_start+1:sect_end-1].keys()
     section_keys = hdr[sect_start+1:sect_end-1].keys()
     # remove any blank keywords
     while section_keys.count('') > 0:
@@ -761,10 +760,7 @@ def remove_distortion_keywords(hdr):
     # does not try to look for non-existent extensions
     for kw in distortion_kws:
         if kw in hdr:
-            try:
-                del hdr[kw]
-            except KeyError:
-                pass
+            del hdr[kw]
 
     # Remove '-SIP' from CTYPE for output product
     if 'ctype1' in hdr and hdr['ctype1'].find('SIP') > -1:
@@ -828,6 +824,7 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
             extnum = fileutil.findKeywordExtn(ftemplate,_extkey,extlist[0])
         else:
             extnum = (extlist[0],fnum)
+        #scihdr = fits.Header(cards=ftemplate[extnum].header.ascard.copy())
         scihdr = fits.Header(ftemplate[extnum].header.copy())
         #scihdr.update('extver',1)
         extnum_sci = extnum
@@ -849,6 +846,8 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
                     extnum = (extlist[0],fnum)
         else:
             extnum = extnum_sci
+
+        #errhdr = fits.Header(cards=ftemplate[extnum].header.ascard.copy())
         errhdr = fits.Header(ftemplate[extnum].header.copy())
         #errhdr.update('extver',1)
         errhdr['bunit'] = 'UNITLESS'
@@ -870,6 +869,7 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
         else:
             extnum = extnum_sci
 
+        #dqhdr = fits.Header(cards=ftemplate[extnum].header.ascard.copy())
         dqhdr = fits.Header(ftemplate[extnum].header.copy())
         #dqhdr.update('extver',1)
         dqhdr['bunit'] = 'UNITLESS'
@@ -924,6 +924,7 @@ def cat_headers(hdr1,hdr2):
     """
     Create new `astropy.io.fits.Header` object from concatenating 2 input Headers
     """
+    #nhdr = hdr1.copy().ascard
     nhdr = hdr1.copy()
     for c in hdr2.cards:
         nhdr.append(c)
