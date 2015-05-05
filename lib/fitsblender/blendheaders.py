@@ -1,6 +1,7 @@
 """ blendheaders - Merge headers from multiple inputs to create a new header and table
 
 """
+from __future__ import absolute_import, print_function
 import os
 import glob
 
@@ -180,8 +181,8 @@ def blendheaders(drzfile, inputs=None, output=None,
             inputs = extract_filenames_from_drz(drzfile)
 
         if verbose:
-            print 'Creating blended headers from: '
-            for i in inputs: print '    ',i
+            print('Creating blended headers from: ')
+            for i in inputs: print('    ',i)
 
         newhdrs, newtab = get_blended_headers(inputs,verbose=verbose)
 
@@ -234,7 +235,7 @@ def blendheaders(drzfile, inputs=None, output=None,
                     # the new dict(header). These will be removed from the output
                     # header altogether
                     tabcols = newtab.data.dtype.names
-                    hdrkws = newhdrs[i].keys()
+                    hdrkws = list(newhdrs[i].keys())
                     del_kws = list(set(tabcols) - set(hdrkws))
                     del_kws.append('HISTORY')
                     for kw in extn.header:
@@ -252,12 +253,12 @@ def blendheaders(drzfile, inputs=None, output=None,
         # Write out the updated product
         if open_mode == 'update':
             drzimg.close()
-            print 'Updated ',drzfile,' with blended headers.'
+            print('Updated ',drzfile,' with blended headers.')
         else:
             if os.path.exists(output): os.remove(output)
             drzimg.writeto(output)
             drzimg.close()
-            print 'Created new file ',output,' with blended headers.'
+            print('Created new file ',output,' with blended headers.')
 
         # Clean up for the next run
         del drzimg, newhdrs, newtab
@@ -331,7 +332,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
         if inst not in icache:
             # initialize the appropriate class for this data's instrument
             inst_class = KeywordRules(inst.lower())
-            print "Found RULEFILE for ",inst.lower(),' of: ',inst_class.rules_file
+            print("Found RULEFILE for ",inst.lower(),' of: ',inst_class.rules_file)
             # Interpret rules for this class based on image that
             # initialized this instrument's rules
             inst_class.interpret_rules(hlist)
@@ -434,7 +435,7 @@ class KeywordRules(object):
             errmsg = 'ERROR:\n'+'    No valid rules file found for:\n'
             errmsg += '    INSTRUMENT = %s\n'%(self.instrument)
             errmsg += '    RULES Version <= %s\n'%(__rules_version__)
-            print textutil.textbox(errmsg)
+            print(textutil.textbox(errmsg))
             raise ValueError
 
         self.rules_file = rules_file
@@ -536,7 +537,7 @@ class KeywordRules(object):
         # the new dict(header). These will be removed from the output
         # header altogether
         tabcols = fbtab.dtype.names
-        hdrkws = fbdict.keys()
+        hdrkws = list(fbdict.keys())
         del_kws = list(set(tabcols) - set(hdrkws))
 
         # Start with a copy of the template as the new header
@@ -555,7 +556,7 @@ class KeywordRules(object):
         # Remove section names from output header(s)
         for name in self.section_names:
             #for indx,kw in zip(range(len(new_header),0,-1),new_header.ascard[-1::-1]):
-            for indx,kw in zip(range(len(new_header),0,-1),new_header[-1::-1]):
+            for indx,kw in zip(list(range(len(new_header),0,-1)),new_header[-1::-1]):
                 if name in str(kw.value):
                     del new_header[indx-1]
                 continue
@@ -609,7 +610,7 @@ class KeywordRules(object):
         """ Reports the index of the specified kw
         """
         indx = []
-        for r,i in zip(self.rules, range(len(self.rules))):
+        for r,i in zip(self.rules, list(range(len(self.rules)))):
             if r[0] == kw: indx.append(i)
         return indx
 
@@ -681,7 +682,7 @@ def interpret_line(line, hdr):
     else:
         kwnames = line.split()
         if '*' in line:
-            kws = hdr[kwnames[0]].keys()
+            kws = list(hdr[kwnames[0]].keys())
             kws2 = kws
         else:
             kws = [kwnames[0]]
@@ -739,7 +740,7 @@ def find_keywords_in_section(hdr,title):
 
     # Now, extract the keyword names from this section
     #section_keys = hdr.ascard[sect_start+1:sect_end-1].keys()
-    section_keys = hdr[sect_start+1:sect_end-1].keys()
+    section_keys = list(hdr[sect_start+1:sect_end-1].keys())
     # remove any blank keywords
     while section_keys.count('') > 0:
         section_keys.remove('')
@@ -768,20 +769,20 @@ def remove_distortion_keywords(hdr):
             hdr['ctype2'] = hdr['ctype2'][:-4]
 
     # Remove SIP coefficients from DRZ product
-    for k in hdr.items():
+    for k in list(hdr.items()):
         if (k[0][:2] in ['A_','B_']) or (k[0][:3] in ['IDC','SCD'] and k[0] != 'IDCTAB') or \
         (k[0][:6] in ['SCTYPE','SCRVAL','SNAXIS','SCRPIX']):
             del hdr[k[0]]
     # Remove paper IV related keywords related to the
     #   DGEO correction here
-    for k in hdr.items():
+    for k in list(hdr.items()):
         if (k[0][:2] == 'DP'):
             try:
                 del hdr[k[0]+'*']
                 del hdr[k[0]+'.*']
                 del hdr[k[0]+'.*.*']
             except:
-                print "ERROR (bleandheaders.remove_distortion_keywords) trying to delete \'{:s}\' in the header.".format(k[0]+'*')
+                print("ERROR (bleandheaders.remove_distortion_keywords) trying to delete \'{:s}\' in the header.".format(k[0]+'*'))
                 pass
         if (k[0][:2] == 'CP'):
             del hdr[k[0]]
@@ -896,26 +897,26 @@ def merge_tables_by_cols(tables):
     new_dtypes = []
     new_cnames = []
     num_rows = len(tables[0])
-    print '#'*40
-    print ''
-    print 'New merge...'
-    print ''
-    print '#'*40
+    print('#'*40)
+    print('')
+    print('New merge...')
+    print('')
+    print('#'*40)
     for t in tables:
         for cname in t.dtype.names:
             if cname not in new_cnames:
                 new_cnames.append(cname)
                 new_dtypes.append((cname,t[cname].dtype.str))
-        print '#'*40
-        print t.dtype
-        print '#'*40
+        print('#'*40)
+        print(t.dtype)
+        print('#'*40)
     # create an empty table with the combined dtypes from all input tables
     new_table = np.zeros((num_rows,),dtype=new_dtypes)
-    print new_dtypes
+    print(new_dtypes)
     # copy data column-by-column from each input to new output table
     for t in tables:
         for cname in t.dtype.names:
-            print 'CNAME: ',cname,' with dtype: ',t[cname].dtype,new_table[cname].dtype
+            print('CNAME: ',cname,' with dtype: ',t[cname].dtype,new_table[cname].dtype)
             new_table[cname] = t[cname]
 
     return new_table
@@ -937,5 +938,5 @@ def extract_filenames_from_drz(drzfile):
     used to generate the drizzle product.
     """
     phdr = fits.getheader(drzfile)
-    fnames = phdr['D0*DATA'].values()
+    fnames = list(phdr['D0*DATA'].values())
     return fnames
