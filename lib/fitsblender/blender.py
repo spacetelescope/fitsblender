@@ -39,24 +39,24 @@ class _KeywordMapping:
     """
     def __init__(self, src_kwd, dst_name, agg_func=None, error_type="ignore",
                  error_value=np.nan):
-        if not isinstance(src_kwd, basestring):
+        if type(src_kwd) != type(''):
             raise TypeError(
                 "The source keyword name must be a string")
 
-        if not isinstance(dst_name, basestring):
+        if type(dst_name) != type(''):
             raise TypeError(
                 "The destination name must be a string")
 
         if agg_func is not None:
             try:
                 for i in agg_func:
-                    if not callable(i):
+                    if not hasattr(i, '__call__'):
                         raise TypeError(
                             "The aggregating function must be a callable " +
                             "object, None or a sequence of callables")
                 self.agg_func_is_sequence = True
             except TypeError:
-                if not callable(agg_func):
+                if not hasattr(agg_func, '__call__'):
                     raise TypeError(
                         "The aggregating function must be a callable object, " +
                         "None or a sequence of callables")

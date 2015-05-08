@@ -26,7 +26,7 @@
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 # USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 # DAMAGE.
-
+from __future__ import print_function
 import glob
 import os
 
@@ -58,9 +58,9 @@ def _test_fitsblender(files):
 
     d, t = fitsblender.fitsblender(files, spec)
 
-    print d
-    print t
-    print t.dtype
+    print(d)
+    print(t)
+    print(t.dtype)
 
     assert_equal(d['crpix'], d['crpix_lower'])
     assert_almost_equal(d['crpix'], 77.6666666666666)
