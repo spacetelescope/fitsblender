@@ -58,7 +58,7 @@ def run( pytools_version = None ) :
     """
 
     if not hasattr(sys, 'version_info') or sys.version_info < (2,3,0,'alpha',0):
-        raise SystemExit, "Python 2.3 or later required."
+        raise SystemExit("Python 2.3 or later required.")
 
     if pytools_version :
         # Only try to import pytools if we are asked to check for a version.
