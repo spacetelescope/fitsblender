@@ -39,7 +39,7 @@ __docformat__ = 'restructuredtext'
 # actually perform the install
 #
 # NOTE: This is not used to install pytools itself!
-
+from __future__ import print_function
 import sys
 
 def run( pytools_version = None ) :
@@ -58,7 +58,7 @@ def run( pytools_version = None ) :
     """
 
     if not hasattr(sys, 'version_info') or sys.version_info < (2,3,0,'alpha',0):
-        raise SystemExit, "Python 2.3 or later required."
+        raise SystemExit("Python 2.3 or later required.")
 
     if pytools_version :
         # Only try to import pytools if we are asked to check for a version.
@@ -70,9 +70,9 @@ def run( pytools_version = None ) :
 
         # bug: should use distutils version comparator to perform ">" comparisons
         if ( pytools.__version__ != pytools_version ) :
-            print "wrong version of pytools!"
-            print "have ",pytools.__version__
-            print "want ",pytools_version
+            print("wrong version of pytools!")
+            print("have ",pytools.__version__)
+            print("want ",pytools_version)
             sys.exit(1)
 
 
