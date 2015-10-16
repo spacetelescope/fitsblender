@@ -31,7 +31,7 @@ import glob
 import os
 
 import numpy as np
-import pyfits
+from astropy.io import fits as pyfits
 from numpy.testing import \
     assert_equal, assert_almost_equal, assert_array_almost_equal, assert_raises
 
