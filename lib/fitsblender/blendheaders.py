@@ -219,7 +219,10 @@ def blendheaders(drzfile, inputs=None, output=None,
                             if extn_naxis > 0:
                                 newhdrs[i][card.keyword] = extn.header[card.keyword]
                             else:
-                                del newhdrs[i][card.keyword]
+                                try:
+                                    del newhdrs[i][card.keyword]
+                                except KeyError:
+                                    pass
                     newhdrs[i].set('EXTNAME', value=extn.header['EXTNAME'], after='ORIGIN')
                     newhdrs[i].set('EXTVER', value=extn.header['EXTVER'], after='EXTNAME')
                     for kw in WCS_KEYWORDS:
@@ -551,7 +554,11 @@ class KeywordRules(object):
         # However, this should only be done for those keywords which do are not
         # being kept in the header through fbdict (additional rules)
         for kw in del_kws :
-            if (kw in new_header): del new_header[kw]
+            if (kw in new_header):
+                try:
+                    del new_header[kw]
+                except KeyError:
+                    pass
 
         # Remove section names from output header(s)
         for name in self.section_names:
@@ -563,7 +570,11 @@ class KeywordRules(object):
 
         # Delete keywords marked in rules file
         for kw in self.delete_kws:
-            if kw in new_header: del new_header[kw]
+            if kw in new_header:
+                try:
+                    del new_header[kw]
+                except KeyError:
+                    pass
 
         # Apply updated/blended values into new header, but only those
         # keywords which are already present in the 'template' new header
@@ -761,7 +772,10 @@ def remove_distortion_keywords(hdr):
     # does not try to look for non-existent extensions
     for kw in distortion_kws:
         if kw in hdr:
-            del hdr[kw]
+            try:
+                del hdr[kw]
+            except KeyError:
+                pass
 
     # Remove '-SIP' from CTYPE for output product
     if 'ctype1' in hdr and hdr['ctype1'].find('SIP') > -1:
@@ -772,7 +786,11 @@ def remove_distortion_keywords(hdr):
     for k in list(hdr.items()):
         if (k[0][:2] in ['A_','B_']) or (k[0][:3] in ['IDC','SCD'] and k[0] != 'IDCTAB') or \
         (k[0][:6] in ['SCTYPE','SCRVAL','SNAXIS','SCRPIX']):
-            del hdr[k[0]]
+            try:
+                del hdr[k[0]]
+            except KeyError:
+                pass
+
     # Remove paper IV related keywords related to the
     #   DGEO correction here
     for k in list(hdr.items()):
@@ -785,8 +803,10 @@ def remove_distortion_keywords(hdr):
                 print("ERROR (bleandheaders.remove_distortion_keywords) trying to delete \'{:s}\' in the header.".format(k[0]+'*'))
                 pass
         if (k[0][:2] == 'CP'):
-            del hdr[k[0]]
-
+            try:
+                del hdr[k[0]]
+            except KeyError:
+                pass
 
 def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
     """
@@ -807,8 +827,11 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
         fnum = fileutil.parseExtn(fextn)[1]
     ftemplate = fileutil.openImage(froot,mode='readonly')
     prihdr = ftemplate['PRIMARY'].header.copy()
-    del prihdr['pcount']
-    del prihdr['gcount']
+    try:
+        del prihdr['pcount']
+        del prihdr['gcount']
+    except KeyError:
+        pass
 
     if fname.find('.fits') > 0 and len(ftemplate) > 1:
 
