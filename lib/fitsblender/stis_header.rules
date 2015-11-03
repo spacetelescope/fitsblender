@@ -409,7 +409,7 @@ FGSLOCK    FGSLOCK    multi
 FILENAME    FILENAME    multi
 FILETYPE    FILETYPE    multi
 FILTER    FILTER    multi
-FLASHCUR    FLASHCUR    first
+FLASHCUR    FLASHCUR    multi
 FLASHDUR    FLASHDUR    first
 FLASHSTA    FLASHSTA    first
 FLATCORR    FLATCORR    multi
