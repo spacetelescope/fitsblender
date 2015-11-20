@@ -11,6 +11,6 @@ setup(
     setup_requires=['d2to1>=0.2.7', 'stsci.distutils>=0.3.2'],
     packages=['stsci'],
     d2to1=True,
-    use_2to3=True,
+    use_2to3=False,
     zip_safe=False
 )
