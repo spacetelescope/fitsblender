@@ -4,6 +4,7 @@
 from __future__ import absolute_import, print_function
 import os
 import glob
+import collections
 
 import numpy as np
 from astropy.io import fits
@@ -294,7 +295,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
     if not isinstance(inputs, list):
         inputs = [inputs]
 
-    phdrdict = {}
+    phdrdict = collections.OrderedDict() #{}
     # Turn input filenames into a set of header objects
     if isinstance(inputs[0], str):
         hdrlist = [[],[],[],[]]
@@ -311,7 +312,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
         phdrdict[rootname] = inputs[0]
         hdrlist = inputs
 
-
+    
     # create a list of unique PRIMARY headers for use later
     phdrlist = []
     for name in phdrdict: phdrlist.append(phdrdict[name])
