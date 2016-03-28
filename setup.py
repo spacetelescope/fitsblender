@@ -1,16 +1,47 @@
 #!/usr/bin/env python
+import recon.release
+from setuptools import setup, find_packages
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distribute_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup
+
+version = recon.release.get_info()
+recon.release.write_template(version, 'lib/fitsblender')
+
 
 setup(
-    setup_requires=['d2to1>=0.2.7', 'stsci.distutils>=0.3.2'],
-    packages=['stsci'],
-    d2to1=True,
-    use_2to3=False,
-    zip_safe=False
+    name = 'fitsblender',
+    version = version.pep386,
+    author = 'Michael Droettboom',
+    author_email = 'help@stsci.edu',
+    description = 'Aggregate values in FITS headers',
+    url = 'https://github.com/spacetelescope/fitsblender',
+    classifiers = [
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Scientific/Engineering :: Astronomy',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+    ],
+    install_requires = [
+        'astropy',
+        'nose',
+        'numpy',
+        'pytools',
+        'sphinx',
+        'stsci.sphinxext',
+        'stsci.tools',
+    ],
+
+    package_dir = {
+        '':'lib'
+    },
+    packages = find_packages('lib'),
+    package_data = {
+        'fitsblender': [
+            'pars/*',
+            'tests/*.fits',
+            '*.rules',
+            'LICENSE.txt'
+        ]
+    },
 )
