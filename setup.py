@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-import recon.release
+import relic.release
 from setuptools import setup, find_packages
 
 
-version = recon.release.get_info()
-recon.release.write_template(version, 'lib/fitsblender')
+version = relic.release.get_info()
+relic.release.write_template(version, 'lib/fitsblender')
 
 
 setup(
