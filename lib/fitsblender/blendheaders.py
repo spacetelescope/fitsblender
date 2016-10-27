@@ -320,7 +320,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
 
     phdrdict = collections.OrderedDict() #{}
     # Turn input filenames into a set of header objects
-    if isinstance(inputs[0], str):
+    if isinstance(inputs[0], basestring):
         hdrlist = [[],[],[],[]]
         for fname in inputs:
             #print 'Getting single template for : ',fname
