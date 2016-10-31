@@ -374,7 +374,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
 
     if len(newtab) > 0:
         # Now merge the results for all the tables into a single table extension
-        new_table = fits.new_table(newtab)
+        new_table = fits.TableHDU.from_columns(newtab)
         new_table.header['EXTNAME'] = 'HDRTAB'
     else:
         new_table = None
@@ -563,7 +563,6 @@ class KeywordRules(object):
 
         # Remove section names from output header(s)
         for name in self.section_names:
-            #for indx,kw in zip(range(len(new_header),0,-1),new_header.ascard[-1::-1]):
             for indx,kw in zip(list(range(len(new_header),0,-1)),new_header[-1::-1]):
                 if name in str(kw.value):
                     del new_header[indx-1]
@@ -587,7 +586,7 @@ class KeywordRules(object):
         # Create summary table
         if len(tabcols) > 0:
             if tabhdu:
-                new_table = fits.new_table(fbtab)
+                new_table = fits.TableHDU.from_columns(fbtab)
                 new_table.header['EXTNAME'] = 'HDRTAB'
             else:
                 new_table = fbtab
