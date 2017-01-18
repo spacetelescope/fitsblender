@@ -118,7 +118,7 @@ def run(configobj):
                 verbose=configobj['verbose'])
 
 #### Primary functional interface for the code
-def blendheaders(drzfile, inputs=None, output=None, 
+def blendheaders(drzfile, inputs=None, output=None,
                 extensions={'SCI':'SCI','ERR':'WHT','DQ':'CON'},
                 sciext='SCI', errext='ERR', dqext='DQ',
                 verbose=False):
@@ -151,7 +151,7 @@ def blendheaders(drzfile, inputs=None, output=None,
     output : str, optional
         If specified, a new file will be written out that contains the updated
         (blended) headers.
-        
+
     extensions : dict, optional
         Translation of input headers to output headers.  Only those headers listed
         in this dict will be blended, with any additional headers of the drzfile
@@ -184,7 +184,7 @@ def blendheaders(drzfile, inputs=None, output=None,
 
     ext_list = []
     for e in extensions: ext_list.append(e)
-    
+
     # operate on each drzfile specified
     for drzfile in drzfiles:
         if inputs in [None, '',' ','INDEF','None']:
@@ -194,7 +194,7 @@ def blendheaders(drzfile, inputs=None, output=None,
             print('Creating blended headers from: ')
             for i in inputs: print('    ',i)
 
-        newhdrs, newtab = get_blended_headers(inputs,verbose=verbose, 
+        newhdrs, newtab = get_blended_headers(inputs,verbose=verbose,
                         extlist=ext_list)
 
         # Remove distortion related keywords not included in rules
@@ -242,7 +242,7 @@ def blendheaders(drzfile, inputs=None, output=None,
                     else:
                         posn = 6
                     newhdrs[i].set('EXTNAME', value=extn.header['EXTNAME'], after=posn)
-                        
+
                     if 'EXTVER' in extn.header:
                         newhdrs[i].set('EXTVER', value=extn.header['EXTVER'], after='EXTNAME')
                     for kw in WCS_KEYWORDS:
@@ -256,7 +256,7 @@ def blendheaders(drzfile, inputs=None, output=None,
                         newhdrs[i]['ROOTNAME'] = extn.header['rootname']
                     else:
                         newhdrs[i]['FILENAME'] = extn.header['filename']
-                        
+
                     newhdrs[i]['BITPIX'] = extn.header['bitpix']
                     # Determine which keywords are included in the table but not
                     # the new dict(header). These will be removed from the output
@@ -343,7 +343,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
         rootname = inputs[0][rname_kw].strip()
         phdrdict[rootname] = inputs[0]
         hdrlist = inputs
-    
+
     # create a list of unique PRIMARY headers for use later
     phdrlist = []
     for name in phdrdict: phdrlist.append(phdrdict[name])
@@ -406,7 +406,7 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
 
     if len(newtab) > 0:
         # Now merge the results for all the tables into a single table extension
-        new_table = fits.TableHDU.from_columns(newtab)
+        new_table = fits.BinTableHDU.from_columns(newtab)
         new_table.header['EXTNAME'] = 'HDRTAB'
     else:
         new_table = None
@@ -622,7 +622,7 @@ class KeywordRules(object):
         # Create summary table
         if len(tabcols) > 0:
             if tabhdu:
-                new_table = fits.TableHDU.from_columns(fbtab)
+                new_table = fits.BinTableHDU.from_columns(fbtab)
                 new_table.header['EXTNAME'] = 'HDRTAB'
             else:
                 new_table = fbtab
