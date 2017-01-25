@@ -318,6 +318,12 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
     if not isinstance(inputs, list):
         inputs = [inputs]
 
+    # for python2/3 compatibility
+    try:
+        basestring
+    except NameError:
+        basestring = str
+
     phdrdict = collections.OrderedDict() #{}
     # Turn input filenames into a set of header objects
     if isinstance(inputs[0], basestring):
