@@ -374,7 +374,9 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
         if inst not in icache:
             # initialize the appropriate class for this data's instrument
             inst_class = KeywordRules(inst, telescope=tel)
-            print("Found RULEFILE for {}/{} of: {}".format(tel,inst, inst_class.rules_file))
+            if verbose:
+                print("Found RULEFILE for {}/{} of: {}".format(tel,inst,
+                    inst_class.rules_file))
             # Interpret rules for this class based on image that
             # initialized this instrument's rules
             inst_class.interpret_rules(hlist)
