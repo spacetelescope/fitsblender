@@ -121,7 +121,7 @@ def run(configobj):
 def blendheaders(drzfile, inputs=None, output=None,
                 extensions={'SCI':'SCI','ERR':'WHT','DQ':'CON'},
                 sciext='SCI', errext='ERR', dqext='DQ',
-                verbose=False):
+                rules_file=None, verbose=False):
     """ Blend headers that went into creating the original drzfile into a
     new header with table that contains keyword values from all input images.
 
@@ -175,6 +175,10 @@ def blendheaders(drzfile, inputs=None, output=None,
         created). If blank or "INDEF", it will use the 'SCI' header as the
         basis for the header of any generated CTX array.
 
+    rules_file : str, optional [Default: None]
+        Filename of a rules file to be used.  If None, look for default file
+        installed with the code.
+    
     verbose : bool, optional [Default: False]
         Print out additional messages during processing when specified.
 
@@ -195,7 +199,7 @@ def blendheaders(drzfile, inputs=None, output=None,
             for i in inputs: print('    ',i)
 
         newhdrs, newtab = get_blended_headers(inputs,verbose=verbose,
-                        extlist=ext_list)
+                        extlist=ext_list, rules_file=rules_file)
 
         # Remove distortion related keywords not included in rules
         for hdr in newhdrs:
@@ -229,7 +233,7 @@ def blendheaders(drzfile, inputs=None, output=None,
                     newhdrs[i]['BITPIX'] = extn.header['BITPIX']
                     for card in newhdrs[i]['naxis*'].items():
                         if len(card[0]) > 5: # naxisj keywords
-                            if extn_naxis > 0:
+                            if card[0] in extn.header and extn_naxis > 0:   
                                 newhdrs[i][card[0]] = extn.header[card[0]]
                             else:
                                 try:
@@ -291,7 +295,7 @@ def blendheaders(drzfile, inputs=None, output=None,
         del drzimg, newhdrs, newtab
 
 
-def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
+def get_blended_headers(inputs, verbose=False, extlist=['SCI','ERR','DQ'], rules_file=None):
     """
     Return a set of blended headers based on the input files/headers provided
 
@@ -301,6 +305,10 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
         Either a single list of filenames from which to extract the headers to
         be blended, or a list of lists of `astropy.io.fits.Header` objects
         to be blended.
+        
+    rules_file : str, optional [Default: None]
+        Filename of a rules file to be used.  If None, look for default file
+        installed with the code.
 
     Returns
     -------
@@ -373,10 +381,8 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
         hlist = [hdrlist[0][i],hdrlist[1][i],hdrlist[2][i],hdrlist[3][i]]
         if inst not in icache:
             # initialize the appropriate class for this data's instrument
-            inst_class = KeywordRules(inst, telescope=tel)
-            if verbose:
-                print("Found RULEFILE for {}/{} of: {}".format(tel,inst,
-                    inst_class.rules_file))
+            inst_class = KeywordRules(inst, telescope=tel, rules_file=rules_file)
+            print("Found RULEFILE for {}/{} of: {}".format(tel,inst, inst_class.rules_file))
             # Interpret rules for this class based on image that
             # initialized this instrument's rules
             inst_class.interpret_rules(hlist)
@@ -425,7 +431,7 @@ class KeywordRules(object):
 
     rules_name_suffix = '_header.rules'
 
-    def __init__(self,instrument, telescope='HST'):
+    def __init__(self,instrument, telescope='HST', rules_file=None): 
         """ Read in the rules used to interpret the keywords from the specified
             instrument image header.
         """
@@ -434,7 +440,11 @@ class KeywordRules(object):
         self.new_header = None
         self.rules_version = None
 
-        self.get_filename() # define rules file
+        # Add support for user-specified rules file...
+        self.rules_file = rules_file
+        if self.rules_file is None:
+            self.get_filename() # define rules file
+
         self.rules_version,i = self.get_rules_header(self.rules_file)
         rfile = open(self.rules_file)
         self.rule_specs = rfile.readlines()
