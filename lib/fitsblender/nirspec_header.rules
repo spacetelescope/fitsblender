@@ -1,0 +1,437 @@
+!VERSION = 1.1
+!INSTRUMENT = NIRSPEC
+################################################################################
+#
+# Header keyword rules
+#
+# Columns definitions:
+#    Column 1: header keyword from input header or '<delete>'
+#    Column 2: [optional] name of table column for recording values from
+#              keyword specified in the first column from each input image
+#              =or= name of keyword to be updated in output image header
+#    Column 3: [optional] function to use to create output header value
+#              (output keyword name must be specified in second column)
+#
+# Any line that starts with '<delete>' indicates that that keyword
+# or set of keywords for that header section should be deleted from the
+# output header.
+#
+# Supported functions: first, last, min, max, mean, sum, stddev, multi
+#
+# Any keyword without a function will be copied to a table column with the
+# name given in the second column, or first column if only 1 column has been
+# specified.  These keywords will also be removed from the output header unless
+# another rule for the same keyword (1st column) has been specified with a
+# function named in the 3rd column.
+#
+# All keywords *not specified in this rules file* will be derived from the first
+# input image's header and used unchanged to create the final output header(s).
+# So, any keyword with a rule that adds that keyword to a table will be removed from
+# the output headers unless additional rules are provided to specify what values
+# should be kept in the header for that keyword.
+##
+# Final header output will use the same formatting and order of keywords defined
+# by the first image's headers.
+#
+# Rules for headers from all image extensions can be included in the same
+# file without regard for order, although keeping them organized by extension
+# makes the file easier to maintain and update.
+#
+# The order of the rules will determine the order of the columns in the
+# final output table. As a result, the rules for EXTNAME and EXTVER are
+# associated with ROOTNAME, rather than the SCI header, in order to make
+# rows of the table easier to identify.
+#
+# Comments appended to the end of a rule will be ignored when reading the
+# rules. All comments start with '#'.
+#
+#
+################################################################################
+#
+# Table Keyword Rules
+#
+################################################################################
+FILENAME
+EXTNAME
+EXTVER
+WCSAXES
+CRPIX1
+CRPIX2
+CRVAL1
+CRVAL2
+CRVAL3
+BITPIX
+NAXIS
+EXTEND
+DATE
+ORIGIN
+FILETYPE
+CAL_VER
+CAL_SVN
+TELESCOP
+RADESYS
+ASNPOOL
+ASNTABLE
+TITLE
+PI_NAME
+CATEGORY
+SUBCAT
+SCICAT
+CONT_ID
+DATE-OBS
+TIME-OBS
+OBS_ID
+VISIT_ID
+PROGRAM
+OBSERVTN
+VISIT
+VISITGRP
+SEQ_ID
+ACT_ID
+EXPOSURE
+TEMPLATE
+OBSLABEL
+VISITYPE
+VSTSTART
+WFSVISIT
+NEXPOSUR
+INTARGET
+TARGOOPP
+TARGPROP
+TARGNAME
+TARGTYPE
+TARG_RA
+TARG_DEC
+TARGURA
+PROP_RA
+PROP_DEC
+INSTRUME
+DETECTOR
+FILTER
+GRATING
+FXD_SLIT
+FOCUSPOS
+MSASTATE
+MSACONFL
+LAMP
+GWA_XTIL
+GWA_YTIL
+PNTG_SEQ
+EXPCOUNT
+EXP_TYPE
+EXPSTART
+EXPMID
+EXPEND
+READPATT
+NINTS
+NGROUPS
+NFRAMES
+GROUPGAP
+NSAMPLES
+TSAMPLE
+TFRAME
+TGROUP
+EFFINTTM
+EFFEXPTM
+CHRGTIME
+DURATION
+NRSTSTRT
+ZEROFRAM
+DATAPROB
+SUBARRAY
+SUBSTRT1
+SUBSTRT2
+SUBSIZE1
+SUBSIZE2
+FASTAXIS
+SLOWAXIS
+COORDSYS
+EPH_TIME
+JWST_X
+JWST_Y
+JWST_Z
+JWST_DX
+JWST_DY
+JWST_DZ
+APERNAME
+PA_APER
+CTYPE1
+CTYPE2
+CTYPE3
+CUNIT1
+CUNIT2
+CUNIT3
+CDELT1
+CDELT2
+CDELT3
+PC1_1
+PC1_2
+PC2_1
+PC2_2
+PC3_1
+PC3_2
+WAVSTART
+WAVEND
+SPORDER
+RA_REF
+DEC_REF
+V2_REF
+V3_REF
+ROLL_REF
+DVA_RA
+DVA_DEC
+VA_SCALE
+BARTDELT
+BSTRTIME
+BENDTIME
+BMIDTIME
+HELIDELT
+HSTRTIME
+HENDTIME
+HMIDTIME
+PHOTMJSR
+PHOTUJA2
+GSSTRTTM
+GSENDTIM
+GDSTARID
+CRDS_VER
+CRDS_CTX
+R_AREA
+R_DARK
+R_GAIN
+R_IFUFOR
+R_IFUPOS
+R_IFUSLI
+R_LINEAR
+R_MASK
+R_PHOTOM
+R_READNO
+R_SATURA
+R_SUPERB
+R_DISTOR
+R_FILOFF
+R_SPDIST
+R_REGION
+R_WAVRAN
+R_V2V3
+R_CAMERA
+R_COLLIM
+R_DISPER
+R_FORE
+R_FPA
+R_MSA
+R_OTE
+S_DQINIT
+S_SUPERB
+S_REFPIX
+S_DARK
+S_SATURA
+S_LINEAR
+S_JUMP
+S_RAMP
+S_WCS
+S_PHOTOM
+S_EXTR2D
+MSACONFG
+NEXTEND
+DPSW_VER
+EXTARGET
+TARRUDEC
+NRESET
+NXLIGHT
+GWAXTILT
+GWAYTILT
+GSURA
+GSUDEC
+GSUMAG
+XTENSION
+BITPIX
+NAXIS
+NAXIS1
+NAXIS2
+PCOUNT
+GCOUNT
+SLTNAME
+SLTSTRT1
+SLTSIZE1
+SLTSTRT2
+SLTSIZE2
+BUNIT
+O_BZERO
+################################################################################
+#
+# Header Keyword Rules
+#
+################################################################################
+SIMPLE SIMPLE  first
+BITPIX BITPIX  first
+NAXIS NAXIS  first
+EXTEND EXTEND  first
+DATE DATE  first
+ORIGIN ORIGIN  first
+FILENAME FILENAME  first
+FILETYPE FILETYPE  first
+CAL_VER CAL_VER  first
+CAL_SVN CAL_SVN  first
+TELESCOP TELESCOP  first
+RADESYS RADESYS  first
+ASNPOOL ASNPOOL  first
+ASNTABLE ASNTABLE  first
+TITLE TITLE  first
+PI_NAME PI_NAME  first
+CATEGORY CATEGORY  first
+SUBCAT SUBCAT  first
+SCICAT SCICAT  first
+CONT_ID CONT_ID  first
+DATE-OBS DATE-OBS  first
+TIME-OBS TIME-OBS  first
+OBS_ID OBS_ID  first
+VISIT_ID VISIT_ID  first
+PROGRAM PROGRAM  first
+OBSERVTN OBSERVTN  first
+VISIT VISIT  first
+VISITGRP VISITGRP  first
+SEQ_ID SEQ_ID  first
+ACT_ID ACT_ID  first
+EXPOSURE EXPOSURE  first
+TEMPLATE TEMPLATE  first
+OBSLABEL OBSLABEL  first
+VISITYPE VISITYPE  first
+VSTSTART VSTSTART  first
+WFSVISIT WFSVISIT  first
+NEXPOSUR NEXPOSUR  first
+INTARGET INTARGET  first
+TARGOOPP TARGOOPP  first
+TARGPROP TARGPROP  first
+TARGNAME TARGNAME  first
+TARGTYPE TARGTYPE  first
+TARG_RA TARG_RA  first
+TARG_DEC TARG_DEC  first
+TARGURA TARGURA  first
+PROP_RA PROP_RA  first
+PROP_DEC PROP_DEC  first
+INSTRUME INSTRUME  first
+DETECTOR DETECTOR  first
+FILTER FILTER  first
+GRATING GRATING  first
+FXD_SLIT FXD_SLIT  first
+FOCUSPOS FOCUSPOS  first
+MSASTATE MSASTATE  first
+MSACONFL MSACONFL  first
+LAMP LAMP  first
+GWA_XTIL GWA_XTIL  first
+GWA_YTIL GWA_YTIL  first
+PNTG_SEQ PNTG_SEQ  first
+EXPCOUNT EXPCOUNT  first
+EXP_TYPE EXP_TYPE  first
+EXPSTART EXPSTART  first
+EXPMID EXPMID  first
+EXPEND EXPEND  first
+READPATT READPATT  first
+NINTS NINTS  first
+NGROUPS NGROUPS  first
+NFRAMES NFRAMES  first
+GROUPGAP GROUPGAP  first
+NSAMPLES NSAMPLES  first
+TSAMPLE TSAMPLE  first
+TFRAME TFRAME  first
+TGROUP TGROUP  first
+EFFINTTM EFFINTTM  first
+EFFEXPTM EFFEXPTM  first
+CHRGTIME CHRGTIME  first
+DURATION DURATION  first
+NRSTSTRT NRSTSTRT  first
+ZEROFRAM ZEROFRAM  first
+DATAPROB DATAPROB  first
+SUBARRAY SUBARRAY  first
+SUBSTRT1 SUBSTRT1  first
+SUBSTRT2 SUBSTRT2  first
+SUBSIZE1 SUBSIZE1  first
+SUBSIZE2 SUBSIZE2  first
+FASTAXIS FASTAXIS  first
+SLOWAXIS SLOWAXIS  first
+COORDSYS COORDSYS  first
+EPH_TIME EPH_TIME  first
+JWST_X JWST_X  first
+JWST_Y JWST_Y  first
+JWST_Z JWST_Z  first
+JWST_DX JWST_DX  first
+JWST_DY JWST_DY  first
+JWST_DZ JWST_DZ  first
+APERNAME APERNAME  first
+PA_APER PA_APER  first
+WCSAXES WCSAXES  first
+CRPIX1 CRPIX1  first
+CRPIX2 CRPIX2  first
+CRVAL1 CRVAL1  first
+CRVAL2 CRVAL2  first
+CRVAL3 CRVAL3  first
+CTYPE1 CTYPE1  first
+CTYPE2 CTYPE2  first
+CTYPE3 CTYPE3  first
+CUNIT1 CUNIT1  first
+CUNIT2 CUNIT2  first
+CUNIT3 CUNIT3  first
+CDELT1 CDELT1  first
+CDELT2 CDELT2  first
+CDELT3 CDELT3  first
+PC1_1 PC1_1  first
+PC1_2 PC1_2  first
+PC2_1 PC2_1  first
+PC2_2 PC2_2  first
+PC3_1 PC3_1  first
+PC3_2 PC3_2  first
+WAVSTART WAVSTART  first
+WAVEND WAVEND  first
+SPORDER SPORDER  first
+RA_REF RA_REF  first
+DEC_REF DEC_REF  first
+V2_REF V2_REF  first
+V3_REF V3_REF  first
+ROLL_REF ROLL_REF  first
+DVA_RA DVA_RA  first
+DVA_DEC DVA_DEC  first
+VA_SCALE VA_SCALE  first
+BARTDELT BARTDELT  first
+BSTRTIME BSTRTIME  first
+BENDTIME BENDTIME  first
+BMIDTIME BMIDTIME  first
+HELIDELT HELIDELT  first
+HSTRTIME HSTRTIME  first
+HENDTIME HENDTIME  first
+HMIDTIME HMIDTIME  first
+PHOTMJSR PHOTMJSR  first
+PHOTUJA2 PHOTUJA2  first
+GSSTRTTM GSSTRTTM  first
+GSENDTIM GSENDTIM  first
+GDSTARID GDSTARID  first
+CRDS_VER CRDS_VER  first
+CRDS_CTX CRDS_CTX  first
+MSACONFG MSACONFG  first
+NEXTEND NEXTEND  first
+DPSW_VER DPSW_VER  first
+EXTARGET EXTARGET  first
+TARRUDEC TARRUDEC  first
+NRESET NRESET  first
+NXLIGHT NXLIGHT  first
+GWAXTILT GWAXTILT  first
+GWAYTILT GWAYTILT  first
+GSURA GSURA  first
+GSUDEC GSUDEC  first
+GSUMAG GSUMAG  first
+XTENSION XTENSION  first
+BITPIX BITPIX  first
+NAXIS NAXIS  first
+NAXIS1 NAXIS1  first
+NAXIS2 NAXIS2  first
+PCOUNT PCOUNT  first
+GCOUNT GCOUNT  first
+EXTNAME EXTNAME  first
+EXTVER EXTVER  first
+SLTNAME SLTNAME  first
+SLTSTRT1 SLTSTRT1  first
+SLTSIZE1 SLTSIZE1  first
+SLTSTRT2 SLTSTRT2  first
+SLTSIZE2 SLTSIZE2  first
+BUNIT BUNIT  first
+O_BZERO O_BZERO  first
