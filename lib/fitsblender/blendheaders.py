@@ -8,6 +8,7 @@ import collections
 
 import numpy as np
 from astropy.io import fits
+from astropy.extern import six
 
 from stsci.tools import fileutil, textutil, parseinput
 
@@ -318,15 +319,9 @@ def get_blended_headers(inputs, verbose=False,extlist=['SCI','ERR','DQ']):
     if not isinstance(inputs, list):
         inputs = [inputs]
 
-    # for python2/3 compatibility
-    try:
-        basestring
-    except NameError:
-        basestring = str
-
     phdrdict = collections.OrderedDict() #{}
     # Turn input filenames into a set of header objects
-    if isinstance(inputs[0], basestring):
+    if isinstance(inputs[0], six.string_types): 
         hdrlist = [[],[],[],[]]
         for fname in inputs:
             #print 'Getting single template for : ',fname
