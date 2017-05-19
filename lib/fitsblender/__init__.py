@@ -29,6 +29,7 @@
 # DAMAGE.
 from __future__ import absolute_import
 import os
+import sys
 
 from . import blender
 from .blender import fitsblender
@@ -39,7 +40,9 @@ from . import blendheaders
 # upon importing this package.
 from stsci.tools import teal
 
-# teal.print_tasknames(__name__, os.path.dirname(__file__))
+# Only print if running from pyraf
+if sys._getframe(1).f_code.co_name == '_irafImport':
+    teal.print_tasknames(__name__, os.path.dirname(__file__))
 
 from .version import *
 
