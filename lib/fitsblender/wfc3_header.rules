@@ -323,6 +323,7 @@ UNITCORR
 VAFACTOR
 WCSAXES
 WCSCDATE
+WCSNAME
 ZOFFCORR
 ZSIGCORR
 ################################################################################

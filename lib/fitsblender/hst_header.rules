@@ -340,6 +340,7 @@ VAFACTOR
 WCSAXES
 WCSCDATE
 WFCMPRSD
+WCSNAME
 WRTERR
 XTENSION
 #
@@ -398,6 +399,7 @@ SNRMEAN   SNRMEAN   mean
 SNRMIN    SNRMIN    min
 TARGNAME  TARGNAME  first
 TELESCOP  TELESCOP  first
+WCSNAME   WCSNAME   first
 ### rules below were added 05Jun2012,in response to Dorothy Fraquelli guidance re: DADS
 ATODCORR  ATODCORR  multi
 ATODGNA   ATODGNA   first
