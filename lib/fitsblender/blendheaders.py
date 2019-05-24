@@ -8,7 +8,7 @@ import collections
 
 import numpy as np
 from astropy.io import fits
-from astropy.extern import six
+import six
 
 from stsci.tools import fileutil, textutil, parseinput
 
