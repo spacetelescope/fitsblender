@@ -1,21 +1,20 @@
-
 # Copyright (C) 2008-2010 Association of Universities for Research in Astronomy (AURA)
-
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-
+#
 #     1. Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
-
+#
 #     2. Redistributions in binary form must reproduce the above
 #       copyright notice, this list of conditions and the following
 #       disclaimer in the documentation and/or other materials provided
 #       with the distribution.
-
+#
 #     3. The name of AURA and its representatives may not be used to
 #       endorse or promote products derived from this software without
 #       specific prior written permission.
-
+#
 # THIS SOFTWARE IS PROVIDED BY AURA ``AS IS'' AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,6 +30,14 @@ from __future__ import absolute_import
 import os
 import sys
 
+from pkg_resources import get_distribution, DistributionNotFound
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    __version__ = 'UNKNOWN'
+
+
 from . import blender
 from .blender import fitsblender
 
@@ -43,6 +50,3 @@ from stsci.tools import teal
 # Only print if running from pyraf
 if sys._getframe(1).f_code.co_name == '_irafImport':
     teal.print_tasknames(__name__, os.path.dirname(__file__))
-
-from .version import *
-

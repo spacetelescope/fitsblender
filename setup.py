@@ -1,16 +1,49 @@
 #!/usr/bin/env python
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distribute_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup
+from setuptools import find_packages
+from setuptools import setup
+
+PACKAGENAME = 'fitsblender'
 
 setup(
-    setup_requires=['d2to1>=0.2.7', 'stsci.distutils>=0.3.2'],
-    packages=['stsci'],
-    d2to1=True,
-    use_2to3=False,
-    zip_safe=False
+    name=PACKAGENAME,
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
+    install_requires=[
+        'astropy',
+        'numpy',
+        'six',
+        'stsci.tools',
+    ],
+    extras_require={
+        'docs': [
+            'sphinx',
+            'numpydoc',
+        ],
+        'test': [
+            'pytest',
+            'pytest-cov',
+            'codecov',
+        ],
+    },
+    packages=find_packages(),
+    package_data={
+        PACKAGENAME: [
+            '*.rules',
+            'pars/*',
+            'tests/*.fits',
+        ],
+    },
+    author='Michael Droettboom',
+    author_email='help@stsci.edu',
+    description='Aggregate values in FITS headers',
+    url='https://github.com/spacetelescope/fitsblender',
+    classifiers = [
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Scientific/Engineering :: Astronomy',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+    ],
 )

@@ -5,3 +5,6 @@ dist
 .eggs
 version.py
 *.pyc
+pip-wheel-metadata
+coverage.xml
+.coverage
