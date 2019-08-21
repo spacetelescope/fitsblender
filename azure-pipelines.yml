@@ -1,0 +1,35 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+strategy:
+  matrix:
+    Python36:
+      python.version: '3.6'
+    Python37:
+      python.version: '3.7'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Python $(python.version)'
+
+- script: |
+    python -m pip install --upgrade pip
+    pip install -e ".[test]"
+  displayName: 'Install dependencies'
+
+- script: |
+    python -m pip freeze
+  displayName: 'Package listing'
+
+- script: |
+    python -m pip install pytest pytest-azurepipelines
+    pytest --cov=./
+    coverage xml
+    codecov -t "$CODECOV"
+  displayName: 'pytest'
+  env:
+    CODECOV: $(codecov)
