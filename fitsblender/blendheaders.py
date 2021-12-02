@@ -606,7 +606,7 @@ class KeywordRules(object):
         # However, this should only be done for those keywords which do are not
         # being kept in the header through fbdict (additional rules)
         for kw in del_kws :
-            if (kw in new_header):
+            if kw in new_header:
                 try:
                     del new_header[kw]
                 except KeyError:
@@ -614,8 +614,9 @@ class KeywordRules(object):
 
         # Remove section names from output header(s)
         for name in self.section_names:
-            for indx,kw in zip(list(range(len(new_header),0,-1)),new_header[-1::-1]):
-                if name in str(kw.value):
+            hdr_vals = [val for val in new_header.values()]
+            for indx,kw in zip(list(range(len(new_header), 0, -1)), hdr_vals[-1::-1]):
+                if name in str(kw):
                     del new_header[indx-1]
                 continue
 
