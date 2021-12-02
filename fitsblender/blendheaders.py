@@ -602,6 +602,25 @@ class KeywordRules(object):
         # in one run
         new_header = headers[0].copy()
 
+        # Remove section names from output header(s), if sections were defined
+        # for deletion
+        if self.section_names and len(self.section_names) > 0:
+            # Start by building list of all section names in the header
+            hdr_vals = [val for val in new_header.values()]
+            # Get the card number for starting card of each section
+            # defined in the header
+            section_indices = [[i, val.strip(' ')] for i, val in enumerate(hdr_vals) if str(val).strip(' ').startswith('/')]
+            del_ranges = []
+            for name in self.section_names:
+                for snum, sindx in enumerate(section_indices):
+                    if sindx[1].strip('/ ') == name:
+                        end_indx = section_indices[snum + 1][0] if snum < (len(section_indices) - 1) else None
+                        del_ranges.append((sindx[0], end_indx))
+            # Now delete these ranges of keywords starting from the end
+            # of the list of section ranges
+            for del_indices in del_ranges[-1::-1]:
+                del new_header[del_indices[0]:del_indices[1]]
+
         # Delete all keywords from copy that are being moved into the table
         # However, this should only be done for those keywords which do are not
         # being kept in the header through fbdict (additional rules)
@@ -611,14 +630,6 @@ class KeywordRules(object):
                     del new_header[kw]
                 except KeyError:
                     pass
-
-        # Remove section names from output header(s)
-        for name in self.section_names:
-            hdr_vals = [val for val in new_header.values()]
-            for indx,kw in zip(list(range(len(new_header), 0, -1)), hdr_vals[-1::-1]):
-                if name in str(kw):
-                    del new_header[indx-1]
-                continue
 
         # Delete keywords marked in rules file
         for kw in self.delete_kws:
