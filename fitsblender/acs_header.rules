@@ -343,30 +343,6 @@ WFCMPRSD
 WCSNAME
 WRTERR
 XTENSION
-#
-# WCS Related Keyword Rules
-#     These move any OPUS-generated WCS values to the table
-#
-WCSNAMEO
-WCSAXESO
-LONPOLEO
-LATPOLEO
-RESTFRQO
-RESTWAVO
-CD1_1O
-CD1_2O
-CD2_1O
-CD2_2O
-CDELT1O
-CDELT2O
-CRPIX1O
-CRPIX2O
-CRVAL1O
-CRVAL2O
-CTYPE1O
-CTYPE2O
-CUNIT1O
-CUNIT2O
 ################################################################################
 #
 # Header Keyword Rules
