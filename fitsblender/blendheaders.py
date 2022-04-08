@@ -610,16 +610,13 @@ class KeywordRules(object):
             # Get the card number for starting card of each section
             # defined in the header
             section_indices = [[i, val.strip(' ')] for i, val in enumerate(hdr_vals) if str(val).strip(' ').startswith('/')]
-            del_ranges = []
-            for name in self.section_names:
-                for snum, sindx in enumerate(section_indices):
-                    if sindx[1].strip('/ ') == name:
-                        end_indx = section_indices[snum + 1][0] if snum < (len(section_indices) - 1) else None
-                        del_ranges.append((sindx[0], end_indx))
-            # Now delete these ranges of keywords starting from the end
-            # of the list of section ranges
-            for del_indices in del_ranges[-1::-1]:
-                del new_header[del_indices[0]:del_indices[1]]
+            # Only review unique section names from list
+            section_names = set(self.section_names)
+            section_names = (list(section_names))
+            for (pos, val) in section_indices[-1::-1]:
+                for name in section_names:
+                    if name in val:
+                        del new_header[pos]
 
         # Delete all keywords from copy that are being moved into the table
         # However, this should only be done for those keywords which do are not
@@ -808,7 +805,13 @@ def find_keywords_in_section(hdr,title):
             if '/' in str(hdr[i]) and hdr[i] not in ['N/A',' ','']:
                 sect_end = i
                 break
-    if sect_end is None: sect_end = len(hdr)
+    if sect_end is None:
+        # Look for first HISTORY card at the end of the header, if present
+        for i,kw in enumerate(hdr.cards):
+            if str(hdr[i]).startswith('HISTORY'):
+                hist_pos = i
+
+        sect_end = len(hdr)
     if sect_start is None:
         return None
 
