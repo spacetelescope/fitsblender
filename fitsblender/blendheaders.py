@@ -807,11 +807,16 @@ def find_keywords_in_section(hdr,title):
                 break
     if sect_end is None:
         # Look for first HISTORY card at the end of the header, if present
+        last_hist = None
         for i,kw in enumerate(hdr.cards):
             if str(hdr[i]).startswith('HISTORY'):
-                hist_pos = i
-
-        sect_end = len(hdr)
+                last_hist = i
+            else:
+                # check to see whether HISTORY keywords have already been found
+                if last_hist is not None:
+                    break
+        sect_end = last_hist
+        # sect_end = len(hdr)
     if sect_start is None:
         return None
 
