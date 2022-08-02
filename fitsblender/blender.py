@@ -32,6 +32,7 @@ import numpy as np
 from numpy import ma
 from astropy.io import fits
 
+
 class _KeywordMapping:
     """
     A simple class to verify and store information about each mapping
@@ -170,8 +171,8 @@ def fitsblender(headers, spec):
       are masked out.
     """
     mappings = [_KeywordMapping(*x) for x in spec]
-    data = [[] for x in spec]
-    data_masks = [[] for x in spec]
+    data = [[] for _ in spec]
+    data_masks = [[] for _ in spec]
 
     # Read in data
     for header in headers:
@@ -208,7 +209,7 @@ def fitsblender(headers, spec):
                 if value is not None:
                     data[i].append(value)
 
-        if hdulist != None:
+        if hdulist is not None:
             hdulist.close()
 
     # Aggregate data into dictionary
@@ -235,7 +236,7 @@ def fitsblender(headers, spec):
     for i, mapping in enumerate(mappings):
         if mapping.agg_func is None:
             array = np.array(data[i])
-            if np.issubdtype(np.int32,array.dtype):
+            if np.issubdtype(np.int32, array.dtype):
                 # see about recasting as int32
                 if not np.any(array/(2**31 - 1) > 1.):
                     array = array.astype(np.int32)
