@@ -38,9 +38,12 @@ from numpy.testing import \
 import fitsblender
 
 ROOT_DIR = None
+
+
 def setup():
     global ROOT_DIR
     ROOT_DIR = os.path.dirname(__file__)
+
 
 def _test_fitsblender(files):
     spec = [
@@ -73,12 +76,14 @@ def _test_fitsblender(files):
     assert_almost_equal(d['crpix_last'], 420.0)
     assert_almost_equal(d['crpix_stddev'], 204.77012857239592)
 
+
 def test_filenames():
     files = [
         (x, 0) for x in glob.glob(os.path.join(ROOT_DIR, "*.fits"))]
     files.sort()
 
     _test_fitsblender(files)
+
 
 def test_header_objects():
     files = glob.glob(os.path.join(ROOT_DIR, "*.fits"))
@@ -87,6 +92,7 @@ def test_header_objects():
 
     _test_fitsblender(headers)
 
+
 def test_nospec():
     """
     Test that no header list and no spec doesn't raise an exception.
@@ -94,6 +100,7 @@ def test_nospec():
     d, t = fitsblender.fitsblender([], [])
     assert d == {}
     assert len(t) == 0
+
 
 def test_raise():
     def raises():
@@ -108,6 +115,7 @@ def test_raise():
     files.sort()
 
     assert_raises(ValueError, raises)
+
 
 def test_raise_table():
     def raises():
