@@ -20,13 +20,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Python 3.9 Tests
+          - name: Python 3.9 Tests Ubuntu
             python-version: '3.9'
             os: ubuntu-latest
             toxenv: py39
 
-          - name: MacOS 3.9 Tests
+          - name: MacOS 3.9 Tests MacOs 11
             os: macos-latest
+            python-version: '3.9'
+            toxenv: py39
+
+          - name: MacOS 3.9 Tests MacOs 12
+            os: macos-12
             python-version: '3.9'
             toxenv: py39
 
