@@ -25,15 +25,30 @@ jobs:
             os: ubuntu-latest
             toxenv: py39
 
-          - name: MacOS 3.9 Tests MacOs 11
-            os: macos-latest
+          - name: Python 3.9 Tests MacOs 11
+            os: macos-11
             python-version: '3.9'
             toxenv: py39
 
-          - name: MacOS 3.9 Tests MacOs 12
+          - name: Python 3.9 Tests MacOs 12
             os: macos-12
             python-version: '3.9'
             toxenv: py39
+
+          - name: Python 3.8 Tests Ubuntu
+            python-version: '3.8'
+            os: ubuntu-latest
+            toxenv: py38
+
+          - name: Python 3.8 Tests MacOs 11
+            os: macos-11
+            python-version: '3.8'
+            toxenv: py38
+
+          - name: Python 3.8 Tests MacOs 12
+            os: macos-12
+            python-version: '3.8'
+            toxenv: py38
 
     steps:
       - name: Checkout code
@@ -49,5 +64,6 @@ jobs:
       - name: Install tox
         run: |
           pip install tox
+
       - name: Run tests
         run: tox -e ${{ matrix.toxenv }}
