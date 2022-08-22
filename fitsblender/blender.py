@@ -40,11 +40,11 @@ class _KeywordMapping:
     """
     def __init__(self, src_kwd, dst_name, agg_func=None, error_type="ignore",
                  error_value=np.nan):
-        if type(src_kwd) != type(''):
+        if not isinstance(src_kwd, str):
             raise TypeError(
                 "The source keyword name must be a string")
 
-        if type(dst_name) != type(''):
+        if not isinstance(dst_name, str):
             raise TypeError(
                 "The destination name must be a string")
 

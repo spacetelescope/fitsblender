@@ -372,7 +372,6 @@ def get_blended_headers(inputs, verbose=False, extlist=['SCI', 'ERR', 'DQ'], rul
     phdrlist = []
     for name in phdrdict: phdrlist.append(phdrdict[name])
 
-    num_chips = len(inputs)
     num_files = len(phdrlist)
 
     # Determine what blending rules need to be merged to create the final
@@ -897,7 +896,7 @@ def remove_distortion_keywords(hdr):
                 del hdr[k[0]+'*']
                 del hdr[k[0]+'.*']
                 del hdr[k[0]+'.*.*']
-            except:
+            except KeyError:
                 print(f"ERROR (bleandheaders.remove_distortion_keywords) trying to delete \'{k[0]}*\' in the header.")
                 pass
         if k[0][:2] == 'CP':
