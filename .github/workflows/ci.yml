@@ -58,12 +58,6 @@ jobs:
             python-version: '3.8'
             toxenv: py38
 
-          # More jobs on stable version of Python to be thorough
-          #- name: Code coverage Python 3.9 Tests Ubuntu
-          #  python-version: '3.9'
-          #  os: ubuntu-latest
-          #  toxenv: coverage
-
           - name: Security audit
             os: Ubuntu-latest
             python-version: '3.9'
