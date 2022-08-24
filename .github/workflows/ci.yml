@@ -74,6 +74,11 @@ jobs:
             python-version: '3.9'
             toxenv: style
 
+          - name: Build documentation Python 3.9 Tests Ubuntu
+            os: Ubuntu-latest
+            python-version: '3.9'
+            toxenv: build-docs
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
