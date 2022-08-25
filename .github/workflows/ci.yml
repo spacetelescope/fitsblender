@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - '*'
+    tags:
+      - '*'
+  pull_request:
+  schedule:
+    # Weekly Tuesday 9:05 PM build
+    - cron: "5 21 * * 2"
+
+jobs:
+  tox:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Jobs on latest version of Python
+          - name: Python 3.10 Tests Ubuntu
+            python-version: '3.10'
+            os: ubuntu-latest
+            toxenv: py310
+
+          - name: Python 3.10 Tests MacOs 11
+            os: macos-latest
+            python-version: '3.10'
+            toxenv: py310
+
+          - name: Python 3.10 Tests MacOs 12
+            os: macos-12
+            python-version: '3.10'
+            toxenv: py310
+
+          # Jobs on stable version of Python
+          - name: Python 3.9 Tests Ubuntu
+            python-version: '3.9'
+            os: ubuntu-latest
+            toxenv: py39
+
+          - name: Python 3.9 Tests MacOs 11
+            os: macos-latest
+            python-version: '3.9'
+            toxenv: py39
+
+          # Jobs on older version of Python
+          - name: Python 3.8 Tests Ubuntu
+            python-version: '3.8'
+            os: ubuntu-latest
+            toxenv: py38
+
+          - name: Python 3.8 Tests MacOs 11
+            os: macos-latest
+            python-version: '3.8'
+            toxenv: py38
+
+          - name: Security audit
+            os: Ubuntu-latest
+            python-version: '3.9'
+            toxenv: security
+
+          - name: Code style check Python 3.9 Tests Ubuntu
+            os: Ubuntu-latest
+            python-version: '3.9'
+            toxenv: style
+
+          - name: Build documentation Python 3.9 Tests Ubuntu
+            os: Ubuntu-latest
+            python-version: '3.9'
+            toxenv: build-docs
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install tox
+        run: |
+          pip install tox
+
+      - name: Run tests
+        run: tox -e ${{ matrix.toxenv }}
+
+      #- name: Update coverage to codecov
+      #  if: ${{ contains(matrix.toxenv,'coverage') }}
+      #  uses: codecov/codecov-action@v2
+      #  with:
+      #    file: ./coverage.xml
+      #    flags: unit
+      #    fail_ci_if_error: true
