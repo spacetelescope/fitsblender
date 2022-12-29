@@ -24,8 +24,9 @@ __rules_version__ = 1.1
 
 fits_required_bool_kws = ['SIMPLE', 'EXTEND']
 WCS_KEYWORDS = ['CD1_1', 'CD1_2', 'CD2_1', 'CD2_2', 'CRPIX1',
-              'CRPIX2', 'CRVAL1', 'CRVAL2', 'CTYPE1', 'CTYPE2',
-              'VAFACTOR', 'ORIENTAT', 'BUNIT', 'WCSNAME']
+                'CRPIX2', 'CRVAL1', 'CRVAL2', 'CTYPE1', 'CTYPE2',
+                'VAFACTOR', 'ORIENTAT', 'BUNIT', 'WCSNAME']
+
 
 #
 # Custom blending functions
@@ -94,6 +95,7 @@ blender_funcs = {'first': blender.first,
 
 delete_command = '<delete>'
 
+
 #
 #  TEAL Interfaces to run this task
 #
@@ -105,35 +107,35 @@ def getHelpAsString(docstring=False):
     htmlfile = os.path.join(install_dir, 'htmlhelp', __taskname__+'.html')
     helpfile = os.path.join(install_dir, __taskname__+'.help')
     if docstring or (not docstring and not os.path.exists(htmlfile)):
-        helpString = __taskname__+' Version '+__version__+' updated on '+__vdate__+'\n\n'
+        help_string = __taskname__+' Version '+__version__+' updated on '+__vdate__+'\n\n'
         if os.path.exists(helpfile):
-            helpString += teal.getHelpFileAsString(__taskname__, __file__)
+            help_string += teal.getHelpFileAsString(__taskname__, __file__)
         else:
-            helpString += blendheaders.__doc__
+            help_string += blendheaders.__doc__
     else:
-        helpString = 'file://'+htmlfile
+        help_string = 'file://'+htmlfile
 
-    return helpString
+    return help_string
 
 
 def run(configobj):
     # Interpret user-input from TEAL GUI and call function
     blendheaders(configobj['drzfile'],
-                inputs=configobj['inputs'],
-                output=configobj['output'],
-                sciext=configobj['sciext'],
-                errext=configobj['errext'],
-                dqext=configobj['dqext'],
-                verbose=configobj['verbose'])
+                 inputs=configobj['inputs'],
+                 output=configobj['output'],
+                 sciext=configobj['sciext'],
+                 errext=configobj['errext'],
+                 dqext=configobj['dqext'],
+                 verbose=configobj['verbose'])
 
 
 #
 #  Primary functional interface for the code
 #
 def blendheaders(drzfile, inputs=None, output=None,
-                extensions={'SCI':'SCI', 'ERR':'WHT', 'DQ':'CON'},
-                sciext='SCI', errext='ERR', dqext='DQ',
-                rules_file=None, verbose=False):
+                 extensions={'SCI': 'SCI', 'ERR': 'WHT', 'DQ': 'CON'},
+                 sciext='SCI', errext='ERR', dqext='DQ',
+                 rules_file=None, verbose=False):
     """ Blend headers that went into creating the original drzfile into a
     new header with table that contains keyword values from all input images.
 
@@ -199,7 +201,8 @@ def blendheaders(drzfile, inputs=None, output=None,
     drzfiles = parseinput.parseinput(drzfile)[0]
 
     ext_list = []
-    for e in extensions: ext_list.append(e)
+    for e in extensions:
+        ext_list.append(e)
 
     # operate on each drzfile specified
     for drzfile in drzfiles:
@@ -208,17 +211,19 @@ def blendheaders(drzfile, inputs=None, output=None,
 
         if verbose:
             print('Creating blended headers from: ')
-            for i in inputs: print('    ', i)
+            for i in inputs:
+                print('    ', i)
 
         newhdrs, newtab = get_blended_headers(inputs, verbose=verbose,
-                        extlist=ext_list, rules_file=rules_file)
+                                              extlist=ext_list,
+                                              rules_file=rules_file)
 
         # Remove distortion related keywords not included in rules
         for hdr in newhdrs:
             remove_distortion_keywords(hdr)
 
         # open drizzle product to update headers with new headers
-        open_mode='update'
+        open_mode = 'update'
         if output not in [None, '', ' ', 'INDEF', 'None']:
             open_mode = 'readonly'
         drzimg = fits.open(drzfile, mode=open_mode)
@@ -296,12 +301,13 @@ def blendheaders(drzfile, inputs=None, output=None,
         # Write out the updated product
         if open_mode == 'update':
             drzimg.close()
-            print('Updated ',drzfile,' with blended headers.')
+            print('Updated ', drzfile, ' with blended headers.')
         else:
-            if os.path.exists(output): os.remove(output)
+            if os.path.exists(output):
+                os.remove(output)
             drzimg.writeto(output)
             drzimg.close()
-            print('Created new file ',output,' with blended headers.')
+            print('Created new file ', output, ' with blended headers.')
 
         # Clean up for the next run
         del drzimg, newhdrs, newtab
@@ -370,7 +376,8 @@ def get_blended_headers(inputs, verbose=False, extlist=['SCI', 'ERR', 'DQ'], rul
 
     # create a list of unique PRIMARY headers for use later
     phdrlist = []
-    for name in phdrdict: phdrlist.append(phdrdict[name])
+    for name in phdrdict:
+        phdrlist.append(phdrdict[name])
 
     num_files = len(phdrlist)
 
@@ -387,13 +394,13 @@ def get_blended_headers(inputs, verbose=False, extlist=['SCI', 'ERR', 'DQ'], rul
         ph = hdrlist[0][i]
         inst = ph['instrume'].lower()
         tel = ph['telescop'].lower()
-        hlist = [hdrlist[0][i],hdrlist[1][i],hdrlist[2][i],hdrlist[3][i]]
+        hlist = [hdrlist[0][i], hdrlist[1][i], hdrlist[2][i], hdrlist[3][i]]
         if inst not in icache:
             # initialize the appropriate class for this data's instrument
             inst_class = KeywordRules(inst, telescope=tel, rules_file=rules_file)
             if verbose:
                 print("Found RULEFILE for {}/{} of: {}".format(tel, inst,
-                    inst_class.rules_file))
+                      inst_class.rules_file))
             # Interpret rules for this class based on image that
             # initialized this instrument's rules
             inst_class.interpret_rules(hlist)
@@ -444,7 +451,7 @@ class KeywordRules(object):
 
     rules_name_suffix = '_header.rules'
 
-    def __init__(self,instrument, telescope='HST', rules_file=None): 
+    def __init__(self, instrument, telescope='HST', rules_file=None):
         """ Read in the rules used to interpret the keywords from the specified
             instrument image header.
         """
@@ -456,7 +463,7 @@ class KeywordRules(object):
         # Add support for user-specified rules file...
         self.rules_file = rules_file
         if self.rules_file is None:
-            self.get_filename() # define rules file
+            self.get_filename()  # define rules file
 
         self.rules_version, i = self.get_rules_header(self.rules_file)
         rfile = open(self.rules_file)
@@ -485,7 +492,7 @@ class KeywordRules(object):
         # This would include picking up any rules files using the default
         # naming convention; namely, <instrument>_header.rules
         for r in rfiles:
-            v,i = self.get_rules_header(r)
+            v, i = self.get_rules_header(r)
             if v is None or i is None:
                 continue
             if v <= __rules_version__ and i == self.instrument.lower():
@@ -495,10 +502,10 @@ class KeywordRules(object):
         if rules_file is None:
             # define default rules name installed with the software
             rules_name = self.instrument.lower()+self.rules_name_suffix
-            rules_file = os.path.join(os.path.dirname(__file__),rules_name)
+            rules_file = os.path.join(os.path.dirname(__file__), rules_name)
             if not os.path.exists(rules_file):
                 rules_name = self.telescope+self.rules_name_suffix
-                rules_file = os.path.join(os.path.dirname(__file__),rules_name)
+                rules_file = os.path.join(os.path.dirname(__file__), rules_name)
                 if not os.path.exists(rules_file):
                     rules_file = None
 
@@ -512,7 +519,7 @@ class KeywordRules(object):
         self.rules_file = rules_file
         return rules_file
 
-    def get_rules_header(self,filename):
+    def get_rules_header(self, filename):
         """
         Open a potential rules file and return the recognized
         version and instrument types provided in the file's first 2 lines
@@ -603,7 +610,7 @@ class KeywordRules(object):
             fits.binTableHDU objects
         """
         # Apply rules to headers
-        fbdict,fbtab = blender.fitsblender(headers, self.rules)
+        fbdict, fbtab = blender.fitsblender(headers, self.rules)
 
         # Determine which keywords are included in the table but not
         # the new dict(header). These will be removed from the output
@@ -724,7 +731,7 @@ class KwRule(object):
             # If self.rules has already been defined for this rule, do not try
             # to interpret it any further with additional headers
             return
-        irules,sname,delkws = interpret_line(self.rule_spec, hdr)
+        irules, sname, delkws = interpret_line(self.rule_spec, hdr)
         # keep track of any section name identified for this rule
         if sname:
             self.section_name.append(sname)
@@ -750,7 +757,7 @@ def interpret_line(line, hdr):
     delete_kws = []
     # Ignore comment lines in rules file
     if line[0] == '#' or len(line.strip()) == 0 or line[0] == '!':
-        return rules,section_name,delete_kws
+        return rules, section_name, delete_kws
     # clean up input lines
     line = line.strip('\n')
 
@@ -876,13 +883,13 @@ def remove_distortion_keywords(hdr):
 
     # Remove '-SIP' from CTYPE for output product
     if 'ctype1' in hdr and hdr['ctype1'].find('SIP') > -1:
-            hdr['ctype1'] = hdr['ctype1'][:-4]
-            hdr['ctype2'] = hdr['ctype2'][:-4]
+        hdr['ctype1'] = hdr['ctype1'][:-4]
+        hdr['ctype2'] = hdr['ctype2'][:-4]
 
     # Remove SIP coefficients from DRZ product
     for k in list(hdr.items()):
-        if (k[0][:2] in ['A_','B_']) or (k[0][:3] in ['IDC','SCD'] and k[0] != 'IDCTAB') or \
-        k[0][:6] in ['SCTYPE','SCRVAL','SNAXIS','SCRPIX']:
+        if (k[0][:2] in ['A_', 'B_']) or (k[0][:3] in ['IDC', 'SCD'] and k[0] != 'IDCTAB') or \
+           k[0][:6] in ['SCTYPE', 'SCRVAL', 'SNAXIS', 'SCRPIX']:
             try:
                 del hdr[k[0]]
             except KeyError:
@@ -951,7 +958,7 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
         # 1. Find the SCI extension in the template image
         # 2. Make a COPY of the extension header for use in new output file
         if fextn is None:
-            extnum = fileutil.findKeywordExtn(ftemplate,_extkey,extlist[0])
+            extnum = fileutil.findKeywordExtn(ftemplate, _extkey, extlist[0])
         else:
             extnum = (extlist[0], fnum)
         scihdr = fits.Header(ftemplate[extnum].header.copy())
@@ -968,10 +975,10 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
                     if 'extname' in f.header and f.header['extname'] == extlist[1]:
                         count += 1
                 if count > 0:
-                    extnum = (extlist[1],fnum)
+                    extnum = (extlist[1], fnum)
                 else:
                     # Use science header for remaining headers
-                    extnum = (extlist[0],fnum)
+                    extnum = (extlist[0], fnum)
         else:
             extnum = extnum_sci
 
@@ -981,17 +988,17 @@ def getSingleTemplate(fname, extlist=['SCI', 'ERR', 'DQ']):
         if len(extlist) > 2 and extlist[2] not in [None, '', ' ', 'INDEF', 'None']:
 
             if fextn is None:
-                extnum = fileutil.findKeywordExtn(ftemplate,_extkey,extlist[2])
+                extnum = fileutil.findKeywordExtn(ftemplate, _extkey, extlist[2])
             else:
                 count = 0
                 for f in ftemplate:
                     if 'extname' in f.header and f.header['extname'] == extlist[2]:
                         count += 1
                 if count > 0:
-                    extnum = (extlist[2],fnum)
+                    extnum = (extlist[2], fnum)
                 else:
                     # Use science header for remaining headers
-                    extnum = (extlist[0],fnum)
+                    extnum = (extlist[0], fnum)
         else:
             extnum = extnum_sci
 
@@ -1046,7 +1053,7 @@ def merge_tables_by_cols(tables):
     return new_table
 
 
-def cat_headers(hdr1,hdr2):
+def cat_headers(hdr1, hdr2):
     """
     Create new `astropy.io.fits.Header` object from concatenating 2 input Headers
     """
