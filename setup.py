@@ -44,7 +44,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/spacetelescope/fitsblender',
-    classifiers = [
+    classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
