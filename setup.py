@@ -27,7 +27,6 @@ setup(
         'test': [
             'pytest',
             'pytest-cov',
-            'codecov',
         ],
     },
     packages=find_packages(),

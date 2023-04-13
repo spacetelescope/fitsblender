@@ -29,9 +29,10 @@ steps:
 
 - script: |
     python -m pip install pytest pytest-azurepipelines
-    pytest --cov=./
-    coverage xml
-    codecov -t "$CODECOV"
+    pytest --cov=./ --cov-report=xml:coverage.xml --cov-report=term-missing
+    curl -Os https://uploader.codecov.io/latest/linux/codecov
+    chmod +x codecov
+    ./codecov -t "$CODECOV"
   displayName: 'pytest'
   env:
     CODECOV: $(codecov)
