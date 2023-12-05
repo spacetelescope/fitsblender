@@ -29,11 +29,11 @@
 from __future__ import absolute_import
 import os
 import sys
+import importlib.metadata
 
-from pkg_resources import get_distribution, DistributionNotFound
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
+    __version__ = importlib.metadata.version(__name__)
+except importlib.metadata.PackageNotFoundError:  # pragma: no cover
     # package is not installed
     __version__ = 'UNKNOWN'
 
