@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - '*'
     tags:
       - '*'
   pull_request:
@@ -26,37 +25,32 @@ jobs:
             os: ubuntu-latest
             toxenv: py310
 
-          - name: Python 3.10 Tests MacOs 11
+          - name: Python 3.10 Tests MacOSX
             os: macos-latest
             python-version: '3.10'
             toxenv: py310
 
-          - name: Python 3.10 Tests MacOs 12
-            os: macos-12
-            python-version: '3.10'
-            toxenv: py310
+          - name: Python 3.11 Tests MacOSX
+            os: macos-latest
+            python-version: '3.11'
+            toxenv: py311
 
           # Jobs on stable version of Python
-          - name: Python 3.9 Tests Ubuntu
+          - name: Python 3.9 Tests Linux
             python-version: '3.9'
             os: ubuntu-latest
             toxenv: py39
 
-          - name: Python 3.9 Tests MacOs 11
+          - name: Python 3.9 Tests Mac
             os: macos-latest
             python-version: '3.9'
             toxenv: py39
 
           # Jobs on older version of Python
-          - name: Python 3.8 Tests Ubuntu
-            python-version: '3.8'
+          - name: Python 3.12 Tests Ubuntu
+            python-version: 3.12
             os: ubuntu-latest
-            toxenv: py38
-
-          - name: Python 3.8 Tests MacOs 11
-            os: macos-latest
-            python-version: '3.8'
-            toxenv: py38
+            toxenv: py312
 
           - name: Security audit
             os: Ubuntu-latest
