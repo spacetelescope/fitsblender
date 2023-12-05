@@ -31,10 +31,10 @@ jobs:
             python-version: '3.10'
             toxenv: py310
 
-          - name: Python 3.10 Tests MacOSX
+          - name: Python 3.11 Tests MacOSX
             os: macos-latest
             python-version: '3.11'
-            toxenv: py310
+            toxenv: py311
 
           # Jobs on stable version of Python
           - name: Python 3.9 Tests Linux
@@ -49,7 +49,7 @@ jobs:
 
           # Jobs on older version of Python
           - name: Python 3.12 Tests Ubuntu
-            python-version: '3.8'
+            python-version: 3.12
             os: ubuntu-latest
             toxenv: py312
 
