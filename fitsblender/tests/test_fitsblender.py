@@ -29,6 +29,7 @@
 from __future__ import print_function
 import glob
 import os
+from pathlib import Path
 
 import numpy as np
 from astropy.io import fits as pyfits
@@ -37,12 +38,7 @@ from numpy.testing import \
 
 import fitsblender
 
-ROOT_DIR = None
-
-
-def setup():
-    global ROOT_DIR
-    ROOT_DIR = os.path.dirname(__file__)
+ROOT_DIR = Path(__file__).parent
 
 
 def _test_fitsblender(files):
@@ -78,15 +74,14 @@ def _test_fitsblender(files):
 
 
 def test_filenames():
-    files = [
-        (x, 0) for x in glob.glob(os.path.join(ROOT_DIR, "*.fits"))]
+    files = [(str(x), 0) for x in ROOT_DIR.glob("*.fits")]
     files.sort()
 
     _test_fitsblender(files)
 
 
 def test_header_objects():
-    files = glob.glob(os.path.join(ROOT_DIR, "*.fits"))
+    files = list(ROOT_DIR.glob("*.fits"))
     files.sort()
     headers = [pyfits.open(x)[0].header for x in files]
 
@@ -110,8 +105,7 @@ def test_raise():
         ('CRPIX1', 'crpix_raise', np.average, 'raises')
         ]
 
-    files = [
-        (x, 0) for x in glob.glob(os.path.join(ROOT_DIR, "*.fits"))]
+    files = [(str(x), 0) for x in ROOT_DIR.glob("*.fits")]
     files.sort()
 
     assert_raises(ValueError, raises)
@@ -125,8 +119,7 @@ def test_raise_table():
         ('CRPIX1', 'crpix_raise', None, 'raises')
         ]
 
-    files = [
-        (x, 0) for x in glob.glob(os.path.join(ROOT_DIR, "*.fits"))]
+    files = [(str(x), 0) for x in ROOT_DIR.glob("*.fits")]
     files.sort()
 
     assert_raises(ValueError, raises)
