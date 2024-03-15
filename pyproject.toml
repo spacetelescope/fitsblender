@@ -20,6 +20,7 @@ dependencies = [
 dynamic = [
     "version",
 ]
+requires-python = ">=3.10"
 
 [project.readme]
 file = "README.md"
@@ -37,8 +38,8 @@ test = [
 
 [build-system]
 requires = [
-    'setuptools >=60',
-    'setuptools_scm[toml] >=3.4',
+    "setuptools >=60",
+    "setuptools_scm[toml] >=3.4",
     "wheel",
 ]
 build-backend = "setuptools.build_meta"
